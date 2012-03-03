@@ -8,18 +8,123 @@
  *
  * Created on 27.02.2012, 22:41:44
  */
-
 package caterpillarssa;
 
+import java.awt.Dimension;
+import java.awt.Image;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+import javax.swing.ImageIcon;
+import javax.swing.JDesktopPane;
+import javax.swing.JFileChooser;
+import javax.swing.JInternalFrame;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.filechooser.FileNameExtensionFilter;
+//import org.jfree.d
 /**
  *
- * @author vaskin
+ * @author Васькин Александр
  */
 public class Frame extends javax.swing.JFrame {
 
+    private Dimension frameSize;
+    private JFileChooser chooserOpen;
+    private UIManager.LookAndFeelInfo l[];
+    private JDesktopPane desctop;
     /** Creates new form Frame */
     public Frame() {
         initComponents();
+        centered();
+        this.setIconImage(getImage());
+        //вид приложения
+        l = UIManager.getInstalledLookAndFeels();
+        try {
+            //загружаем соответствующий интерфейс
+            UIManager.setLookAndFeel(l[1].getClassName());
+            //обновляем все элементы графического интерфейса
+            SwingUtilities.updateComponentTreeUI(this);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        /*JToolBar toolbar = new JToolBar("Toolbar", JToolBar.HORIZONTAL);
+        JButton b =  new JButton(new ImageIcon("folder_32.png"));
+        toolbar.add(b);
+        this.getContentPane().add(toolbar, BorderLayout.NORTH);*/
+        openFileItem.addActionListener((new OpenFile()));
+        desctop = new JDesktopPane();
+        setContentPane(desctop);
+        
+    }
+
+    /**
+     * метод, центрирующий приложение на экране
+     */
+    private void centered() {
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        frameSize = this.getSize();
+        if (frameSize.height > screenSize.height) {
+            frameSize.height = screenSize.height;
+        }
+        if (frameSize.width > screenSize.width) {
+            frameSize.width = screenSize.width;
+        }
+        this.setLocation((screenSize.width - frameSize.width) / 2,
+                (screenSize.height - frameSize.height) / 2);
+    }
+
+    /**
+     * метод используется для изменения иконки приложения
+     * @return объект ImageIcon
+     */
+    protected static Image getImage() {
+        java.net.URL imgURL = caterpillarssa.Frame.class.getResource("/image/gnibbles.png");
+        if (imgURL != null) {
+            return new ImageIcon(imgURL).getImage();
+        } else {
+            return null;
+        }
+    }
+
+    private class OpenFile implements ActionListener {
+
+        public void actionPerformed(ActionEvent e) {
+            List<Double> timeSeries = new ArrayList<Double>();
+            if (chooserOpen == null) {
+                chooserOpen = new JFileChooser();
+                chooserOpen.setCurrentDirectory(new File("."));
+                //FileNameExtensionFilter filter = new FileNameExtensionFilter("Text files", "txt", "doc", "docx");
+                //chooserOpen.setFileFilter(filter);
+            }
+            int result = chooserOpen.showDialog(Frame.this, "Открыть");
+            String fileName = chooserOpen.getSelectedFile().getPath();
+            if (result == JFileChooser.APPROVE_OPTION) {
+                try {
+                    double n;
+                    FileReader inpt = new FileReader(fileName);
+                    Scanner scn = new Scanner(inpt);
+                    while(scn.hasNextDouble()) {
+                        timeSeries.add(scn.nextDouble());
+                        //System.out.println(scn.nextDouble());
+                    }
+                    scn.close();
+                    inpt.close();
+
+                    desctop.add(InternalFrame.createInternalFrame(
+                            XYChart.createChart(timeSeries, "Временной ряд", "Исходный", fileName), "Временной ряд"));
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        }
+        
     }
 
     /** This method is called from within the constructor to
@@ -31,7 +136,48 @@ public class Frame extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jMenuBar1 = new javax.swing.JMenuBar();
+        jMenu1 = new javax.swing.JMenu();
+        openFileItem = new javax.swing.JMenuItem();
+        jSeparator1 = new javax.swing.JPopupMenu.Separator();
+        jMenuItem2 = new javax.swing.JMenuItem();
+        jMenu2 = new javax.swing.JMenu();
+        jMenuItem3 = new javax.swing.JMenuItem();
+        jMenuItem4 = new javax.swing.JMenuItem();
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Гусеница-SSA");
+
+        jMenu1.setText("Файл");
+
+        openFileItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image/folder_16.png"))); // NOI18N
+        openFileItem.setText("Открыть");
+        openFileItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                openFileItemActionPerformed(evt);
+            }
+        });
+        jMenu1.add(openFileItem);
+        jMenu1.add(jSeparator1);
+
+        jMenuItem2.setText("Выход");
+        jMenu1.add(jMenuItem2);
+
+        jMenuBar1.add(jMenu1);
+
+        jMenu2.setText("Справка");
+
+        jMenuItem3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image/help_16.png"))); // NOI18N
+        jMenuItem3.setText("Помощь");
+        jMenu2.add(jMenuItem3);
+
+        jMenuItem4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image/info_16.png"))); // NOI18N
+        jMenuItem4.setText("О программе");
+        jMenu2.add(jMenuItem4);
+
+        jMenuBar1.add(jMenu2);
+
+        setJMenuBar(jMenuBar1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -41,24 +187,22 @@ public class Frame extends javax.swing.JFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+            .addGap(0, 279, Short.MAX_VALUE)
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    /**
-    * @param args the command line arguments
-    */
-    public static void main(String args[]) {
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new Frame().setVisible(true);
-            }
-        });
-    }
-
+    private void openFileItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openFileItemActionPerformed
+    }//GEN-LAST:event_openFileItemActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenu jMenu2;
+    private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenuItem jMenuItem2;
+    private javax.swing.JMenuItem jMenuItem3;
+    private javax.swing.JMenuItem jMenuItem4;
+    private javax.swing.JPopupMenu.Separator jSeparator1;
+    private javax.swing.JMenuItem openFileItem;
     // End of variables declaration//GEN-END:variables
-
 }

@@ -1,13 +1,11 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package caterpillarssa;
+
+import java.awt.EventQueue;
+import javax.swing.JFrame;
 
 /**
  *
- * @author vaskin
+ * @author Васькин Александр
  */
 public class Caterpillar {
 
@@ -15,7 +13,13 @@ public class Caterpillar {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // TODO code application logic here
-    }
+        EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                Frame f = new Frame();
+                f.setExtendedState(JFrame.MAXIMIZED_BOTH);
+                f.setVisible(true);
+            }
+        });
 
+    }
 }
