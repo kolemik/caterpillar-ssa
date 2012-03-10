@@ -15,6 +15,7 @@ import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyVetoException;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -27,8 +28,10 @@ import javax.swing.JFileChooser;
 import javax.swing.JInternalFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
 //import org.jfree.d
+
 /**
  *
  * @author Васькин Александр
@@ -39,6 +42,7 @@ public class Frame extends javax.swing.JFrame {
     private JFileChooser chooserOpen;
     private UIManager.LookAndFeelInfo l[];
     private JDesktopPane desctop;
+    private SSAData data;
     /** Creates new form Frame */
     public Frame() {
         initComponents();
@@ -58,10 +62,28 @@ public class Frame extends javax.swing.JFrame {
         JButton b =  new JButton(new ImageIcon("folder_32.png"));
         toolbar.add(b);
         this.getContentPane().add(toolbar, BorderLayout.NORTH);*/
-        openFileItem.addActionListener((new OpenFile()));
+        data = new SSAData();
+        openFileItem.addActionListener((new OpenFile(data)));
+        analysisItem.addActionListener(new Analysis(data, this));
         desctop = new JDesktopPane();
         setContentPane(desctop);
-        
+        calcItem.addMenuListener(new MenuListener() {
+
+            public void menuSelected(MenuEvent e) {
+                if(data.getTimeSeries().isEmpty()) {
+                    analysisItem.setEnabled(false);
+                } else {
+                    analysisItem.setEnabled(true);
+                }
+            }
+
+            public void menuDeselected(MenuEvent e) {
+            }
+
+            public void menuCanceled(MenuEvent e) {
+            }
+        });
+
     }
 
     /**
@@ -94,9 +116,12 @@ public class Frame extends javax.swing.JFrame {
     }
 
     private class OpenFile implements ActionListener {
-
+        private SSAData timeSeries;
+        public OpenFile(SSAData timeSeries) {
+            this.timeSeries = timeSeries;
+        }
         public void actionPerformed(ActionEvent e) {
-            List<Double> timeSeries = new ArrayList<Double>();
+            List<Double> timeSeriesList = new ArrayList<Double>();
             if (chooserOpen == null) {
                 chooserOpen = new JFileChooser();
                 chooserOpen.setCurrentDirectory(new File("."));
@@ -110,21 +135,27 @@ public class Frame extends javax.swing.JFrame {
                     double n;
                     FileReader inpt = new FileReader(fileName);
                     Scanner scn = new Scanner(inpt);
-                    while(scn.hasNextDouble()) {
-                        timeSeries.add(scn.nextDouble());
+                    while (scn.hasNextDouble()) {
+                        timeSeriesList.add(scn.nextDouble());
                         //System.out.println(scn.nextDouble());
                     }
                     scn.close();
                     inpt.close();
+                    timeSeries.setTimeSeries(timeSeriesList);
+                    JInternalFrame timeSeriesFrame = InternalFrame.createInternalFrame(
+                            XYChart.createChart(timeSeriesList, "Временной ряд", "Исходный", fileName), "Временной ряд");
+                    desctop.add(timeSeriesFrame);
+                    try {
+                        timeSeriesFrame.setMaximum(true);
+                    } catch (PropertyVetoException ex) {
+                        ex.printStackTrace();
+                    }
 
-                    desctop.add(InternalFrame.createInternalFrame(
-                            XYChart.createChart(timeSeries, "Временной ряд", "Исходный", fileName), "Временной ряд"));
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
             }
         }
-        
     }
 
     /** This method is called from within the constructor to
@@ -137,18 +168,20 @@ public class Frame extends javax.swing.JFrame {
     private void initComponents() {
 
         jMenuBar1 = new javax.swing.JMenuBar();
-        jMenu1 = new javax.swing.JMenu();
+        fileItem = new javax.swing.JMenu();
         openFileItem = new javax.swing.JMenuItem();
         jSeparator1 = new javax.swing.JPopupMenu.Separator();
         jMenuItem2 = new javax.swing.JMenuItem();
-        jMenu2 = new javax.swing.JMenu();
+        calcItem = new javax.swing.JMenu();
+        analysisItem = new javax.swing.JMenuItem();
+        infoItem = new javax.swing.JMenu();
         jMenuItem3 = new javax.swing.JMenuItem();
         jMenuItem4 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Гусеница-SSA");
 
-        jMenu1.setText("Файл");
+        fileItem.setText("Файл");
 
         openFileItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image/folder_16.png"))); // NOI18N
         openFileItem.setText("Открыть");
@@ -157,25 +190,35 @@ public class Frame extends javax.swing.JFrame {
                 openFileItemActionPerformed(evt);
             }
         });
-        jMenu1.add(openFileItem);
-        jMenu1.add(jSeparator1);
+        fileItem.add(openFileItem);
+        fileItem.add(jSeparator1);
 
         jMenuItem2.setText("Выход");
-        jMenu1.add(jMenuItem2);
+        fileItem.add(jMenuItem2);
 
-        jMenuBar1.add(jMenu1);
+        jMenuBar1.add(fileItem);
 
-        jMenu2.setText("Справка");
+        calcItem.setText("Вычисление");
+
+        analysisItem.setText("Разложение");
+        analysisItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                analysisItemActionPerformed(evt);
+            }
+        });
+        calcItem.add(analysisItem);
+
+        jMenuBar1.add(calcItem);
 
         jMenuItem3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image/help_16.png"))); // NOI18N
         jMenuItem3.setText("Помощь");
-        jMenu2.add(jMenuItem3);
+        infoItem.add(jMenuItem3);
 
         jMenuItem4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image/info_16.png"))); // NOI18N
         jMenuItem4.setText("О программе");
-        jMenu2.add(jMenuItem4);
+        infoItem.add(jMenuItem4);
 
-        jMenuBar1.add(jMenu2);
+        jMenuBar1.add(infoItem);
 
         setJMenuBar(jMenuBar1);
 
@@ -195,9 +238,16 @@ public class Frame extends javax.swing.JFrame {
 
     private void openFileItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openFileItemActionPerformed
     }//GEN-LAST:event_openFileItemActionPerformed
+
+    private void analysisItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_analysisItemActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_analysisItemActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JMenu jMenu1;
-    private javax.swing.JMenu jMenu2;
+    private javax.swing.JMenuItem analysisItem;
+    private javax.swing.JMenu calcItem;
+    private javax.swing.JMenu fileItem;
+    private javax.swing.JMenu infoItem;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;

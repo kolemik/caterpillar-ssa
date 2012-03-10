@@ -1,6 +1,9 @@
 package caterpillarssa;
 
 import java.awt.BorderLayout;
+import java.beans.PropertyVetoException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JInternalFrame;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -17,10 +20,12 @@ public class InternalFrame {
         chartPanel.setMouseWheelEnabled(true);
         chartPanel.setDisplayToolTips(true);
         chartPanel.setInitialDelay(0);
-        iframe.setSize(400, 400);
+        iframe.setSize(600, 400);
         iframe.add(chartPanel, BorderLayout.CENTER);
+
         //
         iframe.setVisible(true);
+
         return iframe;
     }
 }
