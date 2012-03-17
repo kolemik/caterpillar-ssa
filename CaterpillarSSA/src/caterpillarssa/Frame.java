@@ -63,10 +63,10 @@ public class Frame extends javax.swing.JFrame {
         toolbar.add(b);
         this.getContentPane().add(toolbar, BorderLayout.NORTH);*/
         data = new SSAData();
-        openFileItem.addActionListener((new OpenFile(data)));
-        analysisItem.addActionListener(new Analysis(data, this));
         desctop = new JDesktopPane();
         setContentPane(desctop);
+        openFileItem.addActionListener((new OpenFile(data)));
+        analysisItem.addActionListener(new Analysis(data, this, desctop));
         calcItem.addMenuListener(new MenuListener() {
 
             public void menuSelected(MenuEvent e) {

@@ -2,6 +2,7 @@ package caterpillarssa;
 
 import Jama.EigenvalueDecomposition;
 import Jama.Matrix;
+import Jama.SingularValueDecomposition;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -46,49 +47,63 @@ public class SpectrumAnalysis {
         //double bb[][] = {{1, -1, 0, 3}, {2, 1, -2, -4}};
         double inclosureMatrix[][] = data.getInclosureMatrix();
         double transp[][] = transpositionMatrix(inclosureMatrix);
-        //double S[][] = new double[inclosureMatrix.length][transp[0].length];
         Matrix S = new Matrix(inclosureMatrix).times(new Matrix(transp));
-        // double ss[][] = S.getArray();
         int d = new Matrix(inclosureMatrix).rank(); //ранг матрицы вложений
         EigenvalueDecomposition decomposition = new EigenvalueDecomposition(S);
-        Matrix eigenvalue = decomposition.getD(); //матрица с собственными значениями
-        double eigenvalueArray[][] = eigenvalue.getArray();
+        Matrix eigenvalue = decomposition.getD();   //матрица с собственными значениями
+        Matrix eigenvec = decomposition.getV();     //матрица собственных векторов
         List<Double> eigenvalueList = new ArrayList<Double>();
-        Double eigenvalueOrder[] = new Double[eigenvalueArray.length];
-        for (int i = 0; i < eigenvalueArray.length; i++) {
-            for (int j = 0; j < eigenvalueArray[i].length; j++) {
+        for (int i = 0; i < eigenvalue.getRowDimension(); i++) {
+            for (int j = 0; j < eigenvalue.getRowDimension(); j++) {
                 if (i == j) {
-                    eigenvalueList.add(eigenvalueArray[i][j]);
+                    eigenvalueList.add(eigenvalue.get(i, j));
                 }
             }
         }
-       /* Arrays.sort(eigenvalueOrder);
-                for (int i = 0; i < eigenvalueOrder.length; i++) {
-            System.out.println(eigenvalueOrder[i]);
-        }
-        Arrays.sort(eigenvalueOrder, Collections.reverseOrder());
-        //Comparator comparator = Collections.reverseOrder();
-        // Collections.sort(eigenvalueList);
-         System.out.println("!");
-        for (int i = 0; i < eigenvalueOrder.length; i++) {
-            System.out.println(eigenvalueOrder[i]);
-        }*/
-        /*Collections.sort(eigenvalueList, Collections.reverseOrder());
-        for (int i = 0; i < eigenvalueList.size(); i++) {
-        System.out.println(eigenvalueList.get(i));
-        }*/
-
-
-
-        Matrix eigenvec = decomposition.getV();
-        double eigen[][] = eigenvalue.getArray();
-        for (int i = 0; i < eigen.length; i++) {
-            for (int j = 0; j < eigen[i].length; j++) {
-                System.out.print(eigen[i][j] + " ");
+        for (int i = 0; i < transp.length; i++) {
+            for (int j = 0; j < transp[i].length; j++) {
+                // System.out.print(transp[i][j]);
             }
-            System.out.println("");
+            // System.out.println("");
         }
 
+        Matrix V[] = new Matrix[d];
+        Matrix U[] = new Matrix[d];
+        Matrix X[] = new Matrix[d]; //элементарные матрицы сингулярного разложения
+        for (int j = 0; j < eigenvec.getColumnDimension(); j++) {
+            double uVec[][] = new double[d][1];
+            for (int k = 0; k < eigenvec.getRowDimension(); k++) {
+                uVec[k][0] = eigenvec.get(k, j);
+            }
+            U[j] = new Matrix(uVec);
+            V[j] = new Matrix(transp).times(U[j]);
+        }
+        for (int i = 0; i < V.length; i++) {
+            for (int j = 0; j < V[i].getRowDimension(); j++) {
+                for (int k = 0; k < V[i].getColumnDimension(); k++) {
+                    double val = V[i].get(j, k) / Math.sqrt(eigenvalueList.get(i));
+                    V[i].set(j, k, val);
+                }
+            }
+        }
+        for (int i = 0; i < X.length; i++) {
+            X[i] = U[i].times(V[i].transpose());
+            for (int j = 0; j < X[i].getRowDimension(); j++) {
+                for (int k = 0; k < X[i].getColumnDimension(); k++) {
+                    double val = X[i].get(j, k) * Math.sqrt(eigenvalueList.get(i));
+                    X[i].set(j, k, val);
+                }
+            }
+        }
+        data.setX(X);
+        for (int i = 0; i < X[0].getRowDimension(); i++) {
+            for (int j = 0; j < X[0].getColumnDimension(); j++) {
+
+                System.out.print(X[0].get(i, j));
+            }
+            System.out.println();
+        }
+       // System.out.println(X[0].getColumnDimension() + " " + X[0].getRowDimension() + " " + X[0].rank());
     }
 
     /**

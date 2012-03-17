@@ -37,10 +37,13 @@ public class XYChart {
                 true,
                 true,
                 false);
-        TextTitle source = new TextTitle(fileName);
-        source.setFont(new Font("SanSerif", Font.PLAIN, 12));
-        source.setPosition(RectangleEdge.TOP);
-        chart.addSubtitle(source);
+        if(!title.equals("")) {
+            TextTitle source = new TextTitle(fileName);
+            source.setFont(new Font("SanSerif", Font.PLAIN, 12));
+            source.setPosition(RectangleEdge.TOP);
+            chart.addSubtitle(source);
+        }
+
         return chart;
     }
 }

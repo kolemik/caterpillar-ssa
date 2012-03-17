@@ -3,14 +3,15 @@
  *
  * Created on 09.03.2012, 16:24:18
  */
-
 package caterpillarssa;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.List;
+import java.beans.PropertyVetoException;
+import javax.swing.JDesktopPane;
+import javax.swing.JInternalFrame;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.UIManager;
 
@@ -23,12 +24,14 @@ public class ParamsDialog extends javax.swing.JDialog {
     private Dimension frameSize;
     private UIManager.LookAndFeelInfo l[];
     private SSAData data;
+    private JDesktopPane desctop;
 
     /** Creates new form ParamsDialog */
-    public ParamsDialog(java.awt.Frame parent, boolean modal, SSAData data) {
+    public ParamsDialog(java.awt.Frame parent, boolean modal, SSAData data, JDesktopPane desctop) {
         super(parent, modal);
         initComponents();
         this.data = data;
+        this.desctop = desctop;
         centered();
         countPoint.setText(Integer.toString(data.getTimeSeries().size()));
         SpinnerNumberModel model = new SpinnerNumberModel(2, 2, data.getTimeSeries().size() - 1, 1);
@@ -36,7 +39,7 @@ public class ParamsDialog extends javax.swing.JDialog {
         okButton.addActionListener(new OKPressListener());
         cancelButton.addActionListener(new CancelListener());
     }
-    
+
     private void centered() {
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         frameSize = this.getSize();
@@ -53,11 +56,18 @@ public class ParamsDialog extends javax.swing.JDialog {
     private class OKPressListener implements ActionListener {
 
         public void actionPerformed(ActionEvent e) {
-           data.setL((Integer)lengthWindowControl.getValue());
-           SpectrumAnalysis.inclosure(data);
-           SpectrumAnalysis.singularDecomposition(data);
+            data.setL((Integer) lengthWindowControl.getValue());
+            SpectrumAnalysis.inclosure(data);
+            SpectrumAnalysis.singularDecomposition(data);
+            /*JInternalFrame mainComponentFrame = InternalFrame.createInternalFrame(
+                    XYChart.createChart(data.getX()[0], "Главные компоненты", "Исходный", ""), "Главные компоненты");
+            desctop.add(mainComponentFrame);
+            try {
+                mainComponentFrame.setMaximum(true);
+            } catch (PropertyVetoException ex) {
+                ex.printStackTrace();
+            }*/
         }
-
     }
 
     private class CancelListener implements ActionListener {
@@ -65,8 +75,8 @@ public class ParamsDialog extends javax.swing.JDialog {
         public void actionPerformed(ActionEvent e) {
             ParamsDialog.this.setVisible(false);
         }
-        
     }
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -178,24 +188,22 @@ public class ParamsDialog extends javax.swing.JDialog {
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_cancelButtonActionPerformed
-
     /**
-    * @param args the command line arguments
-    */
+     * @param args the command line arguments
+     */
     /*public static void main(String args[]) {
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                ParamsDialog dialog = new ParamsDialog(new javax.swing.JFrame(), true);
-                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-                    public void windowClosing(java.awt.event.WindowEvent e) {
-                        System.exit(0);
-                    }
-                });
-                dialog.setVisible(true);
-            }
-        });
+    java.awt.EventQueue.invokeLater(new Runnable() {
+    public void run() {
+    ParamsDialog dialog = new ParamsDialog(new javax.swing.JFrame(), true);
+    dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+    public void windowClosing(java.awt.event.WindowEvent e) {
+    System.exit(0);
+    }
+    });
+    dialog.setVisible(true);
+    }
+    });
     }*/
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cancelButton;
     private javax.swing.JLabel countPoint;
@@ -205,5 +213,4 @@ public class ParamsDialog extends javax.swing.JDialog {
     private javax.swing.JSpinner lengthWindowControl;
     private javax.swing.JButton okButton;
     // End of variables declaration//GEN-END:variables
-
 }

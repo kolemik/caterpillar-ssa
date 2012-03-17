@@ -1,5 +1,6 @@
 package caterpillarssa;
 
+import Jama.Matrix;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,9 +10,10 @@ import java.util.List;
  */
 public class SSAData {
 
-    private List<Double> timeSeries;
-    private int L;
-    private double inclosureMatrix[][];
+    private List<Double> timeSeries; //исходный временной ряд
+    private int L; //длина окна
+    private double inclosureMatrix[][]; //матрица вложений
+    private Matrix X[]; //элементарные матрицы сингулярного разложения
 
     public SSAData() {
         timeSeries = new ArrayList<Double>();
@@ -40,5 +42,12 @@ public class SSAData {
 
     public void setInclosureMatrix(double matrix[][]) {
         inclosureMatrix = matrix;
+    }
+
+    public Matrix[] getX() {
+        return X;
+    }
+    public void setX(Matrix X[]) {
+        this.X = X;
     }
 }
