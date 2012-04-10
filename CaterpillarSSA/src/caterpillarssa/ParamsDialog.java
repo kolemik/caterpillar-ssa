@@ -14,6 +14,9 @@ import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.UIManager;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 
 /**
  *
@@ -59,6 +62,19 @@ public class ParamsDialog extends javax.swing.JDialog {
             data.setL((Integer) lengthWindowControl.getValue());
             SpectrumAnalysis.inclosure(data);
             SpectrumAnalysis.singularDecomposition(data);
+			SpectrumAnalysis.setMovingAvarege(data);
+			JFreeChart chart = XYChart.createChart(data.getSMA(), "Скользящие средние", "Средние", "");
+			final XYPlot plot = chart.getXYPlot();
+			final XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
+			plot.setRenderer(renderer);
+			JInternalFrame SMAFrame = InternalFrame.createInternalFrame(chart, "Скользящие средние");
+            desctop.add(SMAFrame);
+			try {
+				SMAFrame.setMaximum(true);
+			} catch (PropertyVetoException ex) {
+				ex.printStackTrace();
+			}
+			ParamsDialog.this.setVisible(false);		
             /*JInternalFrame mainComponentFrame = InternalFrame.createInternalFrame(
                     XYChart.createChart(data.getX()[0], "Главные компоненты", "Исходный", ""), "Главные компоненты");
             desctop.add(mainComponentFrame);

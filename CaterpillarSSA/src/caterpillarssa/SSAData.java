@@ -14,6 +14,7 @@ public class SSAData {
     private int L; //длина окна
     private double inclosureMatrix[][]; //матрица вложений
     private Matrix X[]; //элементарные матрицы сингулярного разложения
+	private List<Double> SMA; //скользящие средние
 
     public SSAData() {
         timeSeries = new ArrayList<Double>();
@@ -47,7 +48,17 @@ public class SSAData {
     public Matrix[] getX() {
         return X;
     }
+	
     public void setX(Matrix X[]) {
         this.X = X;
     }
+	
+	public List<Double> getSMA() {
+		return SMA;
+	}
+	
+	public void setSMA(List<Double> SMA) {
+		this.SMA = SMA;
+	}
+	
 }

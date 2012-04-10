@@ -30,6 +30,9 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.plot.XYPlot;
 //import org.jfree.d
 
 /**
@@ -142,15 +145,19 @@ public class Frame extends javax.swing.JFrame {
                     scn.close();
                     inpt.close();
                     timeSeries.setTimeSeries(timeSeriesList);
-                    JInternalFrame timeSeriesFrame = InternalFrame.createInternalFrame(
-                            XYChart.createChart(timeSeriesList, "Временной ряд", "Исходный", fileName), "Временной ряд");
+					JFreeChart chart = XYChart.createChart(timeSeriesList, "Временной ряд", "Исходный", fileName);
+                    JInternalFrame timeSeriesFrame = InternalFrame.createInternalFrame(chart, "Временной ряд");
+					final XYPlot plot = chart.getXYPlot();
+					NumberAxis rangeAxis = (NumberAxis)plot.getRangeAxis();
+					NumberAxis domainAxis = (NumberAxis)plot.getDomainAxis();
+					rangeAxis.setLowerBound(timeSeriesList.get(0));
+					domainAxis.setRange(1, timeSeriesList.size());
                     desctop.add(timeSeriesFrame);
                     try {
                         timeSeriesFrame.setMaximum(true);
                     } catch (PropertyVetoException ex) {
                         ex.printStackTrace();
                     }
-
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }

@@ -47,6 +47,7 @@ public class SpectrumAnalysis {
         //double bb[][] = {{1, -1, 0, 3}, {2, 1, -2, -4}};
         double inclosureMatrix[][] = data.getInclosureMatrix();
         double transp[][] = transpositionMatrix(inclosureMatrix);
+		//System.out.println("size: " + inclosureMatrix.length + " " + inclosureMatrix[0].length);
         Matrix S = new Matrix(inclosureMatrix).times(new Matrix(transp));
         int d = new Matrix(inclosureMatrix).rank(); //ранг матрицы вложений
         EigenvalueDecomposition decomposition = new EigenvalueDecomposition(S);
@@ -60,19 +61,22 @@ public class SpectrumAnalysis {
                 }
             }
         }
-        for (int i = 0; i < transp.length; i++) {
-            for (int j = 0; j < transp[i].length; j++) {
-                // System.out.print(transp[i][j]);
+        /*for (int i = 0; i < S.getRowDimension(); i++) {
+            for (int j = 0; j < S.getColumnDimension(); j++) {
+                System.out.print(S.get(i, j));
             }
-            // System.out.println("");
-        }
+            System.out.println("");
+        }*/
 
         Matrix V[] = new Matrix[d];
         Matrix U[] = new Matrix[d];
         Matrix X[] = new Matrix[d]; //элементарные матрицы сингулярного разложения
+		//System.out.println(eigenvec.getColumnDimension() + " " + eigenvec.getRowDimension() + " " + d);
         for (int j = 0; j < eigenvec.getColumnDimension(); j++) {
             double uVec[][] = new double[d][1];
             for (int k = 0; k < eigenvec.getRowDimension(); k++) {
+				eigenvec.get(k, j);
+				//System.out.println(k);
                 uVec[k][0] = eigenvec.get(k, j);
             }
             U[j] = new Matrix(uVec);
@@ -96,13 +100,13 @@ public class SpectrumAnalysis {
             }
         }
         data.setX(X);
-        for (int i = 0; i < X[0].getRowDimension(); i++) {
+        /*for (int i = 0; i < X[0].getRowDimension(); i++) {
             for (int j = 0; j < X[0].getColumnDimension(); j++) {
 
                 System.out.print(X[0].get(i, j));
             }
             System.out.println();
-        }
+        }*/
        // System.out.println(X[0].getColumnDimension() + " " + X[0].getRowDimension() + " " + X[0].rank());
     }
 
@@ -120,6 +124,30 @@ public class SpectrumAnalysis {
         }
         return transpMatrix;
     }
+	
+	/**
+	 * формирование скользящих средних
+	 * @param data данные для анализа
+	 */
+	public static void setMovingAvarege(SSAData data) {
+		List<Double> SMA = new ArrayList<Double>();
+		int m = data.getTimeSeries().size() - data.getL() + 1; //период осреднени/
+		for (int i = 0; i < data.getL(); i++) {
+			double sum = 0;
+			double avg = 0;
+			for(int j = i; j < m + i; j++) {
+				sum += data.getTimeSeries().get(j);
+			}
+			avg = sum / m;
+			SMA.add(avg);
+			data.setSMA(SMA);
+			//System.out.println(avg);
+		}
+	}
+	
+	public static void averagedCovariance(SSAData data) {
+		
+	}
 
     /*private static double[][] multiplicationMatrix(double a[][], double b[][]) {
     double c[][] = new double[a.length][b[0].length];
