@@ -16,6 +16,10 @@ public class SSAData {
     private Matrix X[];			//элементарные матрицы сингулярного разложения
 	private List<Double> SMA;			//скользящие средние
 	private List<Double> cov;			//диагональное осреднение ковариаций
+	private List<Double> eigenValueList;//собственные числа
+	private List<Double> lgEigenValue;  //логарифмы собственных чисел
+	private List<Double> sqrtEigenValue;//корни собственных чисел
+	
 
     public SSAData() {
         timeSeries = new ArrayList<Double>();
@@ -70,4 +74,28 @@ public class SSAData {
 		this.cov = cov;
 	}
 	
+	public void setLgEigenValue(List<Double> lgEigenValue) {
+		this.lgEigenValue = lgEigenValue;
+	}
+	
+	public List<Double> getLgEigenValue() {
+		return lgEigenValue;
+	}
+	
+	public void setSqrtEigenValue(List<Double> sqrtEigenValue) {
+		this.sqrtEigenValue = sqrtEigenValue;
+	}
+	
+	public List<Double> getSqrtEigenValue() {
+		return sqrtEigenValue;
+	}
+
+	public List<Double> getEigenValueList() {
+		return eigenValueList;
+	}
+
+	public void setEigenValueList(List<Double> eigenValueList) {
+		this.eigenValueList = eigenValueList;
+	}
+		
 }

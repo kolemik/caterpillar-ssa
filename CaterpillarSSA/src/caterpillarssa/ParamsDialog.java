@@ -10,6 +10,8 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyVetoException;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 import javax.swing.JSplitPane;
@@ -62,24 +64,33 @@ public class ParamsDialog extends javax.swing.JDialog {
 	private class OKPressListener implements ActionListener {
 
 		public void actionPerformed(ActionEvent e) {
+			ArrayList listSeries;
+			List<String> seriesTitle;
+			
 			data.setL((Integer) lengthWindowControl.getValue());
 			SpectrumAnalysis.inclosure(data);
 			SpectrumAnalysis.singularDecomposition(data);
 			SpectrumAnalysis.setMovingAvarege(data);
 			SpectrumAnalysis.averagedCovariance(data);
-
-			JInternalFrame secondMomentFrame = new JInternalFrame("Вторые моменты", true, true, true);
-
-			JFreeChart chart = XYChart.createChart(data.getSMA(), "Скользящие средние", "Средние", "");
-			final XYPlot plotSMA = chart.getXYPlot();
-			final XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
-			plotSMA.setRenderer(renderer);
+			SpectrumAnalysis.functionEigenValue(data);
+			
+			JInternalFrame secondMomentFrame = new JInternalFrame("Вторые моменты", true, true, true, true);
+			
+			listSeries = new ArrayList();
+			seriesTitle = new ArrayList<String>();
+			listSeries.add(data.getSMA());
+			seriesTitle.add("Средние");
+			JFreeChart chart = XYChart.createChart(listSeries, "Скользящие средние", seriesTitle, "", true);
 			ChartPanel chartPanel = new ChartPanel(chart);
 			chartPanel.setMouseWheelEnabled(true);
 			chartPanel.setDisplayToolTips(true);
 			chartPanel.setInitialDelay(0);
 
-			JFreeChart avgChart = XYChart.createChart(data.getCov(), "Осреднённые ковариации", "Осреднённые ковариации", "");
+			listSeries = new ArrayList();
+			seriesTitle = new ArrayList<String>();
+			listSeries.add(data.getCov());
+			seriesTitle.add("Осреднённые ковариации");
+			JFreeChart avgChart = XYChart.createChart(listSeries, "Осреднённые ковариации", seriesTitle, "", true);
 			final XYPlot plotAvg = avgChart.getXYPlot();
 			NumberAxis domainAxis = (NumberAxis) plotAvg.getDomainAxis();
 			domainAxis.setRange(1, data.getCov().size());
@@ -88,10 +99,26 @@ public class ParamsDialog extends javax.swing.JDialog {
 			avgChartPanel.setDisplayToolTips(true);
 			avgChartPanel.setInitialDelay(0);
 			
+			listSeries = new ArrayList();
+			seriesTitle = new ArrayList<String>();
+			listSeries.add(data.getSqrtEigenValue());
+			listSeries.add(data.getLgEigenValue());
+			seriesTitle.add("Корни из собственных чисел");
+			seriesTitle.add("Логарифмы собственных чисел");
+			JFreeChart funcChart = XYChart.createChart(listSeries, "Функции собственных чисел", seriesTitle, "", true);
+			ChartPanel funcChartPanel = new ChartPanel(funcChart);
+			funcChartPanel.setMouseWheelEnabled(true);
+			funcChartPanel.setDisplayToolTips(true);
+			funcChartPanel.setInitialDelay(0);
+			JInternalFrame funcFrame = InternalFrame.createInternalFrame(funcChart, "Функции собственных чисел");
+			funcFrame.setSize(650, 600);
+			funcFrame.setVisible(true);
+			
 			JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, chartPanel, avgChartPanel);
 			secondMomentFrame.add(splitPane);
 			secondMomentFrame.setVisible(true);
 			desctop.add(secondMomentFrame);
+			desctop.add(funcFrame);
 			try {
 				secondMomentFrame.setMaximum(true);
 			} catch (PropertyVetoException ex) {

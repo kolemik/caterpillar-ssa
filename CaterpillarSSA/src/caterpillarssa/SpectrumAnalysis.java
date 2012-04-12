@@ -2,10 +2,9 @@ package caterpillarssa;
 
 import Jama.EigenvalueDecomposition;
 import Jama.Matrix;
-import Jama.SingularValueDecomposition;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -60,29 +59,16 @@ public class SpectrumAnalysis {
 				}
 			}
 		}
-		System.out.println("S: rows = " + S.getRowDimension() + " " + "columns = " + S.getColumnDimension() + " inclosure: rows = " + inclosureMatrix.length + " columns = " + inclosureMatrix[0].length);
-		/*for (int i = 0; i < inclosureMatrix.length; i++) {
-		for (int j = 0; j < inclosureMatrix[i].length; j++) {
-		System.out.print(inclosureMatrix[i][j] + " ");
-		}
-		System.out.println("");
-		}*/
-		/*for (int i = 0; i < S.getRowDimension(); i++) {
-		for (int j = 0; j < S.getColumnDimension(); j++) {
-		System.out.print(S.get(i, j));
-		}
-		System.out.println("");
-		}*/
+		Comparator comparator = Collections.reverseOrder();
+		Collections.sort(eigenvalueList,comparator);
+		data.setEigenValueList(eigenvalueList);
 
 		Matrix V[] = new Matrix[d];
 		Matrix U[] = new Matrix[d];
 		Matrix X[] = new Matrix[d]; //элементарные матрицы сингулярного разложения
-		//System.out.println(eigenvec.getColumnDimension() + " " + eigenvec.getRowDimension() + " " + d);
 		for (int j = 0; j < eigenvec.getColumnDimension(); j++) {
 			double uVec[][] = new double[d][1];
 			for (int k = 0; k < eigenvec.getRowDimension(); k++) {
-				eigenvec.get(k, j);
-				//System.out.println(k);
 				uVec[k][0] = eigenvec.get(k, j);
 			}
 			U[j] = new Matrix(uVec);
@@ -180,6 +166,17 @@ public class SpectrumAnalysis {
 			}
 		}
 		data.setCov(covarianceList);
+	}
+	
+	public static void functionEigenValue(SSAData data) {
+		List<Double> lgList = new ArrayList<Double>();
+		List<Double> sqrtList = new ArrayList<Double>();
+		for (int i = 0; i < data.getEigenValueList().size(); i++) {
+			lgList.add(Math.log(data.getEigenValueList().get(i)));
+			sqrtList.add(Math.sqrt(data.getEigenValueList().get(i)));
+		}
+		data.setLgEigenValue(lgList);
+		data.setSqrtEigenValue(sqrtList);
 	}
 
 	/*private static double[][] multiplicationMatrix(double a[][], double b[][]) {

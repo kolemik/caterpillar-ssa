@@ -41,136 +41,145 @@ import org.jfree.chart.plot.XYPlot;
  */
 public class Frame extends javax.swing.JFrame {
 
-    private Dimension frameSize;
-    private JFileChooser chooserOpen;
-    private UIManager.LookAndFeelInfo l[];
-    private JDesktopPane desctop;
-    private SSAData data;
-    /** Creates new form Frame */
-    public Frame() {
-        initComponents();
-        centered();
-        this.setIconImage(getImage());
-        //вид приложения
-        l = UIManager.getInstalledLookAndFeels();
-        try {
-            //загружаем соответствующий интерфейс
-            UIManager.setLookAndFeel(l[1].getClassName());
-            //обновляем все элементы графического интерфейса
-            SwingUtilities.updateComponentTreeUI(this);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        /*JToolBar toolbar = new JToolBar("Toolbar", JToolBar.HORIZONTAL);
-        JButton b =  new JButton(new ImageIcon("folder_32.png"));
-        toolbar.add(b);
-        this.getContentPane().add(toolbar, BorderLayout.NORTH);*/
-        data = new SSAData();
-        desctop = new JDesktopPane();
-        setContentPane(desctop);
-        openFileItem.addActionListener((new OpenFile(data)));
-        analysisItem.addActionListener(new Analysis(data, this, desctop));
-        calcItem.addMenuListener(new MenuListener() {
+	private Dimension frameSize;
+	private JFileChooser chooserOpen;
+	private UIManager.LookAndFeelInfo l[];
+	private JDesktopPane desctop;
+	private SSAData data;
 
-            public void menuSelected(MenuEvent e) {
-                if(data.getTimeSeries().isEmpty()) {
-                    analysisItem.setEnabled(false);
-                } else {
-                    analysisItem.setEnabled(true);
-                }
-            }
+	/** Creates new form Frame */
+	public Frame() {
+		initComponents();
+		centered();
+		this.setIconImage(getImage());
+		//вид приложения
+		l = UIManager.getInstalledLookAndFeels();
+		try {
+			//загружаем соответствующий интерфейс
+			UIManager.setLookAndFeel(l[1].getClassName());
+			//обновляем все элементы графического интерфейса
+			SwingUtilities.updateComponentTreeUI(this);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		/*JToolBar toolbar = new JToolBar("Toolbar", JToolBar.HORIZONTAL);
+		JButton b =  new JButton(new ImageIcon("folder_32.png"));
+		toolbar.add(b);
+		this.getContentPane().add(toolbar, BorderLayout.NORTH);*/
+		data = new SSAData();
+		desctop = new JDesktopPane();
+		setContentPane(desctop);
+		openFileItem.addActionListener((new OpenFile(data)));
+		analysisItem.addActionListener(new Analysis(data, this, desctop));
+		calcItem.addMenuListener(new MenuListener() {
 
-            public void menuDeselected(MenuEvent e) {
-            }
+			public void menuSelected(MenuEvent e) {
+				if (data.getTimeSeries().isEmpty()) {
+					analysisItem.setEnabled(false);
+				} else {
+					analysisItem.setEnabled(true);
+				}
+			}
 
-            public void menuCanceled(MenuEvent e) {
-            }
-        });
+			public void menuDeselected(MenuEvent e) {
+			}
 
-    }
+			public void menuCanceled(MenuEvent e) {
+			}
+		});
 
-    /**
-     * метод, центрирующий приложение на экране
-     */
-    private void centered() {
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        frameSize = this.getSize();
-        if (frameSize.height > screenSize.height) {
-            frameSize.height = screenSize.height;
-        }
-        if (frameSize.width > screenSize.width) {
-            frameSize.width = screenSize.width;
-        }
-        this.setLocation((screenSize.width - frameSize.width) / 2,
-                (screenSize.height - frameSize.height) / 2);
-    }
+	}
 
-    /**
-     * метод используется для изменения иконки приложения
-     * @return объект ImageIcon
-     */
-    protected static Image getImage() {
-        java.net.URL imgURL = caterpillarssa.Frame.class.getResource("/image/gnibbles.png");
-        if (imgURL != null) {
-            return new ImageIcon(imgURL).getImage();
-        } else {
-            return null;
-        }
-    }
+	/**
+	 * метод, центрирующий приложение на экране
+	 */
+	private void centered() {
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		frameSize = this.getSize();
+		if (frameSize.height > screenSize.height) {
+			frameSize.height = screenSize.height;
+		}
+		if (frameSize.width > screenSize.width) {
+			frameSize.width = screenSize.width;
+		}
+		this.setLocation((screenSize.width - frameSize.width) / 2,
+				(screenSize.height - frameSize.height) / 2);
+	}
 
-    private class OpenFile implements ActionListener {
-        private SSAData timeSeries;
-        public OpenFile(SSAData timeSeries) {
-            this.timeSeries = timeSeries;
-        }
-        public void actionPerformed(ActionEvent e) {
-            List<Double> timeSeriesList = new ArrayList<Double>();
-            if (chooserOpen == null) {
-                chooserOpen = new JFileChooser();
-                chooserOpen.setCurrentDirectory(new File("."));
-                //FileNameExtensionFilter filter = new FileNameExtensionFilter("Text files", "txt", "doc", "docx");
-                //chooserOpen.setFileFilter(filter);
-            }
-            int result = chooserOpen.showDialog(Frame.this, "Открыть");
-            String fileName = chooserOpen.getSelectedFile().getPath();
-            if (result == JFileChooser.APPROVE_OPTION) {
-                try {
-                    double n;
-                    FileReader inpt = new FileReader(fileName);
-                    Scanner scn = new Scanner(inpt);
-                    while (scn.hasNextDouble()) {
-                        timeSeriesList.add(scn.nextDouble());
-                        //System.out.println(scn.nextDouble());
-                    }
-                    scn.close();
-                    inpt.close();
-                    timeSeries.setTimeSeries(timeSeriesList);
-					JFreeChart chart = XYChart.createChart(timeSeriesList, "Временной ряд", "Исходный", fileName);
-                    JInternalFrame timeSeriesFrame = InternalFrame.createInternalFrame(chart, "Временной ряд");
+	/**
+	 * метод используется для изменения иконки приложения
+	 * @return объект ImageIcon
+	 */
+	protected static Image getImage() {
+		java.net.URL imgURL = caterpillarssa.Frame.class.getResource("/image/gnibbles.png");
+		if (imgURL != null) {
+			return new ImageIcon(imgURL).getImage();
+		} else {
+			return null;
+		}
+	}
+
+	private class OpenFile implements ActionListener {
+
+		private SSAData timeSeries;
+
+		public OpenFile(SSAData timeSeries) {
+			this.timeSeries = timeSeries;
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			List<Double> timeSeriesList = new ArrayList<Double>();
+			List<String> seriesTitle;
+			ArrayList listSeries;
+			if (chooserOpen == null) {
+				chooserOpen = new JFileChooser();
+				chooserOpen.setCurrentDirectory(new File("."));
+				//FileNameExtensionFilter filter = new FileNameExtensionFilter("Text files", "txt", "doc", "docx");
+				//chooserOpen.setFileFilter(filter);
+			}
+			int result = chooserOpen.showDialog(Frame.this, "Открыть");
+			String fileName = chooserOpen.getSelectedFile().getPath();
+			if (result == JFileChooser.APPROVE_OPTION) {
+				try {
+					double n;
+					FileReader inpt = new FileReader(fileName);
+					Scanner scn = new Scanner(inpt);
+					while (scn.hasNextDouble()) {
+						timeSeriesList.add(scn.nextDouble());
+					}
+					scn.close();
+					inpt.close();
+					timeSeries.setTimeSeries(timeSeriesList);
+					listSeries = new ArrayList();
+					listSeries.add(timeSeriesList);
+					seriesTitle = new ArrayList<String>();
+					seriesTitle.add("Исходный");
+					JFreeChart chart = XYChart.createChart(listSeries, "Временной ряд", seriesTitle, fileName, false);
+					JInternalFrame timeSeriesFrame = InternalFrame.createInternalFrame(chart, "Временной ряд");
 					final XYPlot plot = chart.getXYPlot();
-					NumberAxis rangeAxis = (NumberAxis)plot.getRangeAxis();
-					NumberAxis domainAxis = (NumberAxis)plot.getDomainAxis();
+					NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
+					NumberAxis domainAxis = (NumberAxis) plot.getDomainAxis();
 					rangeAxis.setLowerBound(timeSeriesList.get(0));
 					domainAxis.setRange(1, timeSeriesList.size());
-                    desctop.add(timeSeriesFrame);
-                    try {
-                        timeSeriesFrame.setMaximum(true);
-                    } catch (PropertyVetoException ex) {
-                        ex.printStackTrace();
-                    }
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
-            }
-        }
-    }
+					desctop.add(timeSeriesFrame);
+					try {
+						timeSeriesFrame.setMaximum(true);
+					} catch (PropertyVetoException ex) {
+						ex.printStackTrace();
+					}
+				} catch (IOException ex) {
+					ex.printStackTrace();
+				}
+			}
+		}
+	}
 
-    /** This method is called from within the constructor to
-     * initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is
-     * always regenerated by the Form Editor.
-     */
-    @SuppressWarnings("unchecked")
+	/** This method is called from within the constructor to
+	 * initialize the form.
+	 * WARNING: Do NOT modify this code. The content of this method is
+	 * always regenerated by the Form Editor.
+	 */
+	@SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
@@ -247,9 +256,8 @@ public class Frame extends javax.swing.JFrame {
     }//GEN-LAST:event_openFileItemActionPerformed
 
     private void analysisItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_analysisItemActionPerformed
-        // TODO add your handling code here:
+		// TODO add your handling code here:
     }//GEN-LAST:event_analysisItemActionPerformed
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem analysisItem;
     private javax.swing.JMenu calcItem;
