@@ -10,11 +10,12 @@ import java.util.List;
  */
 public class SSAData {
 
-    private List<Double> timeSeries; //исходный временной ряд
-    private int L; //длина окна
+    private List<Double> timeSeries;	//исходный временной ряд
+    private int L;						//длина окна
     private double inclosureMatrix[][]; //матрица вложений
-    private Matrix X[]; //элементарные матрицы сингулярного разложения
-	private List<Double> SMA; //скользящие средние
+    private Matrix X[];			//элементарные матрицы сингулярного разложения
+	private List<Double> SMA;			//скользящие средние
+	private List<Double> cov;			//диагональное осреднение ковариаций
 
     public SSAData() {
         timeSeries = new ArrayList<Double>();
@@ -59,6 +60,14 @@ public class SSAData {
 	
 	public void setSMA(List<Double> SMA) {
 		this.SMA = SMA;
+	}
+	
+	public List<Double> getCov() {
+		return cov;
+	}
+	
+	public void setCov(List<Double> cov) {
+		this.cov = cov;
 	}
 	
 }

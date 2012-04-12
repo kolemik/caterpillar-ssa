@@ -12,9 +12,12 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyVetoException;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
+import javax.swing.JSplitPane;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.UIManager;
+import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 
@@ -24,81 +27,93 @@ import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
  */
 public class ParamsDialog extends javax.swing.JDialog {
 
-    private Dimension frameSize;
-    private UIManager.LookAndFeelInfo l[];
-    private SSAData data;
-    private JDesktopPane desctop;
+	private Dimension frameSize;
+	private UIManager.LookAndFeelInfo l[];
+	private SSAData data;
+	private JDesktopPane desctop;
 
-    /** Creates new form ParamsDialog */
-    public ParamsDialog(java.awt.Frame parent, boolean modal, SSAData data, JDesktopPane desctop) {
-        super(parent, modal);
-        initComponents();
-        this.data = data;
-        this.desctop = desctop;
-        centered();
-        countPoint.setText(Integer.toString(data.getTimeSeries().size()));
-        SpinnerNumberModel model = new SpinnerNumberModel(2, 2, data.getTimeSeries().size() - 1, 1);
-        lengthWindowControl.setModel(model);
-        okButton.addActionListener(new OKPressListener());
-        cancelButton.addActionListener(new CancelListener());
-    }
+	/** Creates new form ParamsDialog */
+	public ParamsDialog(java.awt.Frame parent, boolean modal, SSAData data, JDesktopPane desctop) {
+		super(parent, modal);
+		initComponents();
+		this.data = data;
+		this.desctop = desctop;
+		centered();
+		countPoint.setText(Integer.toString(data.getTimeSeries().size()));
+		SpinnerNumberModel model = new SpinnerNumberModel(2, 2, data.getTimeSeries().size() - 1, 1);
+		lengthWindowControl.setModel(model);
+		okButton.addActionListener(new OKPressListener());
+		cancelButton.addActionListener(new CancelListener());
+	}
 
-    private void centered() {
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        frameSize = this.getSize();
-        if (frameSize.height > screenSize.height) {
-            frameSize.height = screenSize.height;
-        }
-        if (frameSize.width > screenSize.width) {
-            frameSize.width = screenSize.width;
-        }
-        this.setLocation((screenSize.width - frameSize.width) / 2,
-                (screenSize.height - frameSize.height) / 2);
-    }
+	private void centered() {
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		frameSize = this.getSize();
+		if (frameSize.height > screenSize.height) {
+			frameSize.height = screenSize.height;
+		}
+		if (frameSize.width > screenSize.width) {
+			frameSize.width = screenSize.width;
+		}
+		this.setLocation((screenSize.width - frameSize.width) / 2,
+				(screenSize.height - frameSize.height) / 2);
+	}
 
-    private class OKPressListener implements ActionListener {
+	private class OKPressListener implements ActionListener {
 
-        public void actionPerformed(ActionEvent e) {
-            data.setL((Integer) lengthWindowControl.getValue());
-            SpectrumAnalysis.inclosure(data);
-            SpectrumAnalysis.singularDecomposition(data);
+		public void actionPerformed(ActionEvent e) {
+			data.setL((Integer) lengthWindowControl.getValue());
+			SpectrumAnalysis.inclosure(data);
+			SpectrumAnalysis.singularDecomposition(data);
 			SpectrumAnalysis.setMovingAvarege(data);
+			SpectrumAnalysis.averagedCovariance(data);
+
+			JInternalFrame secondMomentFrame = new JInternalFrame("Вторые моменты", true, true, true);
+
 			JFreeChart chart = XYChart.createChart(data.getSMA(), "Скользящие средние", "Средние", "");
-			final XYPlot plot = chart.getXYPlot();
+			final XYPlot plotSMA = chart.getXYPlot();
 			final XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
-			plot.setRenderer(renderer);
-			JInternalFrame SMAFrame = InternalFrame.createInternalFrame(chart, "Скользящие средние");
-            desctop.add(SMAFrame);
+			plotSMA.setRenderer(renderer);
+			ChartPanel chartPanel = new ChartPanel(chart);
+			chartPanel.setMouseWheelEnabled(true);
+			chartPanel.setDisplayToolTips(true);
+			chartPanel.setInitialDelay(0);
+
+			JFreeChart avgChart = XYChart.createChart(data.getCov(), "Осреднённые ковариации", "Осреднённые ковариации", "");
+			final XYPlot plotAvg = avgChart.getXYPlot();
+			NumberAxis domainAxis = (NumberAxis) plotAvg.getDomainAxis();
+			domainAxis.setRange(1, data.getCov().size());
+			ChartPanel avgChartPanel = new ChartPanel(avgChart);
+			avgChartPanel.setMouseWheelEnabled(true);
+			avgChartPanel.setDisplayToolTips(true);
+			avgChartPanel.setInitialDelay(0);
+			
+			JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, chartPanel, avgChartPanel);
+			secondMomentFrame.add(splitPane);
+			secondMomentFrame.setVisible(true);
+			desctop.add(secondMomentFrame);
 			try {
-				SMAFrame.setMaximum(true);
+				secondMomentFrame.setMaximum(true);
 			} catch (PropertyVetoException ex) {
 				ex.printStackTrace();
 			}
-			ParamsDialog.this.setVisible(false);		
-            /*JInternalFrame mainComponentFrame = InternalFrame.createInternalFrame(
-                    XYChart.createChart(data.getX()[0], "Главные компоненты", "Исходный", ""), "Главные компоненты");
-            desctop.add(mainComponentFrame);
-            try {
-                mainComponentFrame.setMaximum(true);
-            } catch (PropertyVetoException ex) {
-                ex.printStackTrace();
-            }*/
-        }
-    }
+			ParamsDialog.this.setVisible(false);
+		}
+	}
 
-    private class CancelListener implements ActionListener {
+	private class CancelListener implements ActionListener {
 
-        public void actionPerformed(ActionEvent e) {
-            ParamsDialog.this.setVisible(false);
-        }
-    }
+		public void actionPerformed(ActionEvent e) {
+			ParamsDialog.this.setVisible(false);
+		}
+	}
 
-    /** This method is called from within the constructor to
-     * initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is
-     * always regenerated by the Form Editor.
-     */
-    @SuppressWarnings("unchecked")
+	/** This method is called from within the constructor to
+	 * initialize the form.
+	 * WARNING: Do NOT modify this code. The content of this method is
+	 * always regenerated by the Form Editor.
+	 */
+	@SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
@@ -198,28 +213,28 @@ public class ParamsDialog extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
-        // TODO add your handling code here:
+		// TODO add your handling code here:
     }//GEN-LAST:event_okButtonActionPerformed
 
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
-        // TODO add your handling code here:
+		// TODO add your handling code here:
     }//GEN-LAST:event_cancelButtonActionPerformed
-    /**
-     * @param args the command line arguments
-     */
-    /*public static void main(String args[]) {
-    java.awt.EventQueue.invokeLater(new Runnable() {
-    public void run() {
-    ParamsDialog dialog = new ParamsDialog(new javax.swing.JFrame(), true);
-    dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-    public void windowClosing(java.awt.event.WindowEvent e) {
-    System.exit(0);
-    }
-    });
-    dialog.setVisible(true);
-    }
-    });
-    }*/
+	/**
+	 * @param args the command line arguments
+	 */
+	/*public static void main(String args[]) {
+	java.awt.EventQueue.invokeLater(new Runnable() {
+	public void run() {
+	ParamsDialog dialog = new ParamsDialog(new javax.swing.JFrame(), true);
+	dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+	public void windowClosing(java.awt.event.WindowEvent e) {
+	System.exit(0);
+	}
+	});
+	dialog.setVisible(true);
+	}
+	});
+	}*/
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cancelButton;
     private javax.swing.JLabel countPoint;
