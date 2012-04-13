@@ -6,22 +6,23 @@
 package caterpillarssa;
 
 import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyVetoException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
+import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.UIManager;
 import org.jfree.chart.ChartPanel;
-import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 
 /**
  *
@@ -33,13 +34,15 @@ public class ParamsDialog extends javax.swing.JDialog {
 	private UIManager.LookAndFeelInfo l[];
 	private SSAData data;
 	private JDesktopPane desctop;
+	private javax.swing.JFrame parent;
 
 	/** Creates new form ParamsDialog */
-	public ParamsDialog(java.awt.Frame parent, boolean modal, SSAData data, JDesktopPane desctop) {
+	public ParamsDialog(javax.swing.JFrame parent, boolean modal, SSAData data, JDesktopPane desctop) {
 		super(parent, modal);
 		initComponents();
 		this.data = data;
 		this.desctop = desctop;
+		this.parent = parent;
 		centered();
 		countPoint.setText(Integer.toString(data.getTimeSeries().size()));
 		SpinnerNumberModel model = new SpinnerNumberModel(2, 2, data.getTimeSeries().size() - 1, 1);
@@ -80,24 +83,16 @@ public class ParamsDialog extends javax.swing.JDialog {
 			seriesTitle = new ArrayList<String>();
 			listSeries.add(data.getSMA());
 			seriesTitle.add("Средние");
-			JFreeChart chart = XYChart.createChart(listSeries, "Скользящие средние", seriesTitle, "", true);
-			ChartPanel chartPanel = new ChartPanel(chart);
-			chartPanel.setMouseWheelEnabled(true);
-			chartPanel.setDisplayToolTips(true);
-			chartPanel.setInitialDelay(0);
+			ChartPanel chart = XYChart.createChart(listSeries, "Скользящие средние", seriesTitle, "", true);
 
 			listSeries = new ArrayList();
 			seriesTitle = new ArrayList<String>();
 			listSeries.add(data.getCov());
 			seriesTitle.add("Осреднённые ковариации");
-			JFreeChart avgChart = XYChart.createChart(listSeries, "Осреднённые ковариации", seriesTitle, "", true);
-			final XYPlot plotAvg = avgChart.getXYPlot();
-			NumberAxis domainAxis = (NumberAxis) plotAvg.getDomainAxis();
-			domainAxis.setRange(1, data.getCov().size());
-			ChartPanel avgChartPanel = new ChartPanel(avgChart);
-			avgChartPanel.setMouseWheelEnabled(true);
-			avgChartPanel.setDisplayToolTips(true);
-			avgChartPanel.setInitialDelay(0);
+			ChartPanel avgChart = XYChart.createChart(listSeries, "Осреднённые ковариации", seriesTitle, "", true);
+			final XYPlot plotAvg = avgChart.getChart().getXYPlot();
+			NumberAxis rangeAxisCov = (NumberAxis) plotAvg.getRangeAxis();
+			rangeAxisCov.setRange((Double)Collections.min(data.getCov()), (Double)Collections.max(data.getCov()));
 			
 			listSeries = new ArrayList();
 			seriesTitle = new ArrayList<String>();
@@ -105,20 +100,45 @@ public class ParamsDialog extends javax.swing.JDialog {
 			listSeries.add(data.getLgEigenValue());
 			seriesTitle.add("Корни из собственных чисел");
 			seriesTitle.add("Логарифмы собственных чисел");
-			JFreeChart funcChart = XYChart.createChart(listSeries, "Функции собственных чисел", seriesTitle, "", true);
-			ChartPanel funcChartPanel = new ChartPanel(funcChart);
-			funcChartPanel.setMouseWheelEnabled(true);
-			funcChartPanel.setDisplayToolTips(true);
-			funcChartPanel.setInitialDelay(0);
+			ChartPanel funcChart = XYChart.createChart(listSeries, "Функции собственных чисел", seriesTitle, "", true);
 			JInternalFrame funcFrame = InternalFrame.createInternalFrame(funcChart, "Функции собственных чисел");
-			funcFrame.setSize(650, 600);
+			//funcFrame.setSize(650, 600);
+			
 			funcFrame.setVisible(true);
 			
-			JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, chartPanel, avgChartPanel);
+			
+			JInternalFrame eigenFuncFrame = new JInternalFrame("Собственные функции", true, true, true, true);
+			JPanel panel = new JPanel();
+			panel.setLayout(new GridLayout(2, 2));
+			List<ChartPanel> eigenVecListCharts = new ArrayList<ChartPanel>();
+			for (int i = 0; i < data.getEigenVectors().size(); i++) {
+				listSeries = new ArrayList();
+				seriesTitle = new ArrayList<String>();
+				seriesTitle.add("" + (i + 1));
+				ArrayList list = (ArrayList)data.getEigenVectors().get(i);
+				listSeries.add(list);
+				ChartPanel eigenVecChart  = XYChart.createChart(listSeries, ("" + i), seriesTitle, "", true);
+				final XYPlot eigenVecPlot = eigenVecChart.getChart().getXYPlot();
+				NumberAxis rangeAxisVec = (NumberAxis) eigenVecPlot.getRangeAxis();
+				rangeAxisVec.setRange((Double)Collections.min(list), (Double)Collections.max(list));			
+				eigenVecListCharts.add(eigenVecChart);
+				panel.add(eigenVecListCharts.get(i));
+			}
+			eigenFuncFrame.add(panel);
+			//eigenFuncFrame.setSize(650, 600);
+			eigenFuncFrame.setVisible(true);
+			
+
+			FrameParams.setInternalFrameParams(secondMomentFrame, desctop, data);
+			FrameParams.setInternalFrameParams(funcFrame, desctop, data);
+			FrameParams.setInternalFrameParams(eigenFuncFrame, desctop, data);
+			
+			JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, chart, avgChart);
 			secondMomentFrame.add(splitPane);
 			secondMomentFrame.setVisible(true);
 			desctop.add(secondMomentFrame);
 			desctop.add(funcFrame);
+			desctop.add(eigenFuncFrame);
 			try {
 				secondMomentFrame.setMaximum(true);
 			} catch (PropertyVetoException ex) {
@@ -134,6 +154,8 @@ public class ParamsDialog extends javax.swing.JDialog {
 			ParamsDialog.this.setVisible(false);
 		}
 	}
+	
+
 
 	/** This method is called from within the constructor to
 	 * initialize the form.

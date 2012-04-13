@@ -4,6 +4,7 @@ import java.awt.Font;
 import java.util.ArrayList;
 import java.util.List;
 import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
@@ -19,7 +20,7 @@ import org.jfree.ui.RectangleEdge;
  */
 public class XYChart {
 
-    public static JFreeChart createChart(List data, String title, List<String> seriesTitle, String fileName, boolean shapeRenderer) {
+    public static ChartPanel createChart(List data, String title, List<String> seriesTitle, String fileName, boolean shapeRenderer) {
 		final XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
         XYSeriesCollection dataset = new XYSeriesCollection();
 		System.out.println(data.size());
@@ -60,6 +61,10 @@ public class XYChart {
 		if(shapeRenderer) {					
 			plot.setRenderer(renderer);
 		}
-        return chart;
+		ChartPanel chartPanel = new ChartPanel(chart);
+		chartPanel.setMouseWheelEnabled(true);
+		chartPanel.setDisplayToolTips(true);
+		chartPanel.setInitialDelay(0);
+        return chartPanel;
     }
 }

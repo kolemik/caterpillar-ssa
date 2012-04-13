@@ -23,14 +23,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import javax.swing.ImageIcon;
-import javax.swing.JDesktopPane;
 import javax.swing.JFileChooser;
 import javax.swing.JInternalFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
-import org.jfree.chart.JFreeChart;
+import org.jfree.chart.ChartPanel;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.XYPlot;
 //import org.jfree.d
@@ -44,8 +43,8 @@ public class Frame extends javax.swing.JFrame {
 	private Dimension frameSize;
 	private JFileChooser chooserOpen;
 	private UIManager.LookAndFeelInfo l[];
-	private JDesktopPane desctop;
 	private SSAData data;
+
 
 	/** Creates new form Frame */
 	public Frame() {
@@ -62,13 +61,11 @@ public class Frame extends javax.swing.JFrame {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		/*JToolBar toolbar = new JToolBar("Toolbar", JToolBar.HORIZONTAL);
-		JButton b =  new JButton(new ImageIcon("folder_32.png"));
-		toolbar.add(b);
-		this.getContentPane().add(toolbar, BorderLayout.NORTH);*/
+
 		data = new SSAData();
-		desctop = new JDesktopPane();
-		setContentPane(desctop);
+		//desctop = new JDesktopPane();
+		//setContentPane(desctop);
+
 		openFileItem.addActionListener((new OpenFile(data)));
 		analysisItem.addActionListener(new Analysis(data, this, desctop));
 		calcItem.addMenuListener(new MenuListener() {
@@ -87,6 +84,25 @@ public class Frame extends javax.swing.JFrame {
 			public void menuCanceled(MenuEvent e) {
 			}
 		});
+		nextToolBar.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent e) {
+				selectNextWindow();
+			}
+		});
+		tileToolBar.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent e) {
+				tileWindows();
+			}
+		});
+		cascadeToolBar.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent e) {
+				cascadeWindows();
+			}
+		});
+		openToolBar.addActionListener(new OpenFile(data));
 
 	}
 
@@ -154,14 +170,15 @@ public class Frame extends javax.swing.JFrame {
 					listSeries.add(timeSeriesList);
 					seriesTitle = new ArrayList<String>();
 					seriesTitle.add("Исходный");
-					JFreeChart chart = XYChart.createChart(listSeries, "Временной ряд", seriesTitle, fileName, false);
+					ChartPanel chart = XYChart.createChart(listSeries, "Временной ряд", seriesTitle, fileName, false);
 					JInternalFrame timeSeriesFrame = InternalFrame.createInternalFrame(chart, "Временной ряд");
-					final XYPlot plot = chart.getXYPlot();
+					final XYPlot plot = chart.getChart().getXYPlot();
 					NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
 					NumberAxis domainAxis = (NumberAxis) plot.getDomainAxis();
 					rangeAxis.setLowerBound(timeSeriesList.get(0));
 					domainAxis.setRange(1, timeSeriesList.size());
 					desctop.add(timeSeriesFrame);
+					FrameParams.setInternalFrameParams(timeSeriesFrame, desctop, data);
 					try {
 						timeSeriesFrame.setMaximum(true);
 					} catch (PropertyVetoException ex) {
@@ -174,6 +191,107 @@ public class Frame extends javax.swing.JFrame {
 		}
 	}
 
+	public void cascadeWindows() {
+		int x = 0;
+		int y = 0;
+		int width = desctop.getWidth() / 2;
+		int height = desctop.getHeight() / 2;
+
+		for (JInternalFrame frame : desctop.getAllFrames()) {
+			if (!frame.isIcon()) {
+				try {
+					// try to make maximized frames resizable; this might be vetoed
+					frame.setMaximum(false);
+					frame.reshape(x, y, width, height);
+
+					x += 650;
+					y += 650;
+					// wrap around at the desktop edge
+					if (x + width > desctop.getWidth()) {
+						x = 0;
+					}
+					if (y + height > desctop.getHeight()) {
+						y = 0;
+					}
+				} catch (PropertyVetoException e) {
+				}
+			}
+		}
+	}
+
+	/**
+	 * Tiles the non-iconified internal frames of the desktop.
+	 */
+	public void tileWindows() {
+		// count frames that aren't iconized
+		int frameCount = 0;
+		for (JInternalFrame frame : desctop.getAllFrames()) {
+			if (!frame.isIcon()) {
+				frameCount++;
+			}
+		}
+		if (frameCount == 0) {
+			return;
+		}
+
+		int rows = (int) Math.sqrt(frameCount);
+		int cols = frameCount / rows;
+		int extra = frameCount % rows;
+		// number of columns with an extra row
+
+		int width = desctop.getWidth() / cols;
+		int height = desctop.getHeight() / rows;
+		int r = 0;
+		int c = 0;
+		for (JInternalFrame frame : desctop.getAllFrames()) {
+			if (!frame.isIcon()) {
+				try {
+					frame.setMaximum(false);
+					frame.reshape(c * width, r * height, width, height);
+					r++;
+					if (r == rows) {
+						r = 0;
+						c++;
+						if (c == cols - extra) {
+							// start adding an extra row
+							rows++;
+							height = desctop.getHeight() / rows;
+						}
+					}
+				} catch (PropertyVetoException e) {
+				}
+			}
+		}
+	}
+
+	/**
+	 * Brings the next non-iconified internal frame to the front.
+	 */
+	public void selectNextWindow() {
+		JInternalFrame[] frames = desctop.getAllFrames();
+		for (int i = 0; i < frames.length; i++) {
+			if (frames[i].isSelected()) {
+				// find next frame that isn't an icon and can be selected
+				int next = (i + 1) % frames.length;
+				while (next != i) {
+					if (!frames[next].isIcon()) {
+						try {
+							// all other frames are icons or veto selection
+							frames[next].setSelected(true);
+							frames[next].toFront();
+							frames[i].toBack();
+							return;
+						} catch (PropertyVetoException e) {
+						}
+					}
+					next = (next + 1) % frames.length;
+				}
+			}
+		}
+	}
+	
+	//public void
+
 	/** This method is called from within the constructor to
 	 * initialize the form.
 	 * WARNING: Do NOT modify this code. The content of this method is
@@ -183,6 +301,12 @@ public class Frame extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        toolBar = new javax.swing.JToolBar();
+        openToolBar = new javax.swing.JButton();
+        nextToolBar = new javax.swing.JButton();
+        cascadeToolBar = new javax.swing.JButton();
+        tileToolBar = new javax.swing.JButton();
+        desctop = new javax.swing.JDesktopPane();
         jMenuBar1 = new javax.swing.JMenuBar();
         fileItem = new javax.swing.JMenu();
         openFileItem = new javax.swing.JMenuItem();
@@ -196,6 +320,37 @@ public class Frame extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Гусеница-SSA");
+
+        toolBar.setRollover(true);
+
+        openToolBar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image/folder.png"))); // NOI18N
+        openToolBar.setFocusable(false);
+        openToolBar.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        openToolBar.setMargin(new java.awt.Insets(3, 3, 3, 3));
+        openToolBar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        toolBar.add(openToolBar);
+
+        nextToolBar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image/next.png"))); // NOI18N
+        nextToolBar.setFocusable(false);
+        nextToolBar.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        nextToolBar.setMargin(new java.awt.Insets(3, 3, 3, 3));
+        nextToolBar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        toolBar.add(nextToolBar);
+
+        cascadeToolBar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image/cascade.png"))); // NOI18N
+        cascadeToolBar.setFocusable(false);
+        cascadeToolBar.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        cascadeToolBar.setLabel("");
+        cascadeToolBar.setMargin(new java.awt.Insets(3, 3, 3, 3));
+        cascadeToolBar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        toolBar.add(cascadeToolBar);
+
+        tileToolBar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image/tile.png"))); // NOI18N
+        tileToolBar.setFocusable(false);
+        tileToolBar.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        tileToolBar.setMargin(new java.awt.Insets(3, 3, 3, 3));
+        tileToolBar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        toolBar.add(tileToolBar);
 
         fileItem.setText("Файл");
 
@@ -242,11 +397,15 @@ public class Frame extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+            .addComponent(desctop, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+            .addComponent(toolBar, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 279, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(toolBar, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(desctop, javax.swing.GroupLayout.DEFAULT_SIZE, 227, Short.MAX_VALUE))
         );
 
         pack();
@@ -261,6 +420,8 @@ public class Frame extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem analysisItem;
     private javax.swing.JMenu calcItem;
+    private javax.swing.JButton cascadeToolBar;
+    private javax.swing.JDesktopPane desctop;
     private javax.swing.JMenu fileItem;
     private javax.swing.JMenu infoItem;
     private javax.swing.JMenuBar jMenuBar1;
@@ -268,6 +429,10 @@ public class Frame extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JPopupMenu.Separator jSeparator1;
+    private javax.swing.JButton nextToolBar;
     private javax.swing.JMenuItem openFileItem;
+    private javax.swing.JButton openToolBar;
+    private javax.swing.JButton tileToolBar;
+    private javax.swing.JToolBar toolBar;
     // End of variables declaration//GEN-END:variables
 }

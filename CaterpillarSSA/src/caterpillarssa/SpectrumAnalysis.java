@@ -52,6 +52,7 @@ public class SpectrumAnalysis {
 		Matrix eigenvalue = decomposition.getD();   //матрица с собственными значениями
 		Matrix eigenvec = decomposition.getV();     //матрица собственных векторов
 		List<Double> eigenvalueList = new ArrayList<Double>();
+		//формируем набор собственных значений, стоящих на диагонали
 		for (int i = 0; i < eigenvalue.getRowDimension(); i++) {
 			for (int j = 0; j < eigenvalue.getRowDimension(); j++) {
 				if (i == j) {
@@ -60,20 +61,36 @@ public class SpectrumAnalysis {
 			}
 		}
 		Comparator comparator = Collections.reverseOrder();
+		/*
+		 * собственные значения должны быть в убывающем порядке, поэтому
+		 * сортируем их в обратном порядке (изначально значения в возрастающем
+		 * порядке)
+		 */
 		Collections.sort(eigenvalueList,comparator);
 		data.setEigenValueList(eigenvalueList);
 
 		Matrix V[] = new Matrix[d];
 		Matrix U[] = new Matrix[d];
 		Matrix X[] = new Matrix[d]; //элементарные матрицы сингулярного разложения
+		ArrayList listSeries = new ArrayList();
 		for (int j = 0; j < eigenvec.getColumnDimension(); j++) {
 			double uVec[][] = new double[d][1];
+			ArrayList series = new ArrayList();
 			for (int k = 0; k < eigenvec.getRowDimension(); k++) {
-				uVec[k][0] = eigenvec.get(k, j);
+				/*
+				 * векторы должны соответствовать собственным числа  (!), поэтому
+				 * начинаем с последнего собственного вектора
+				 */
+				uVec[k][0] = eigenvec.get(k, eigenvec.getColumnDimension() - j - 1);
+				series.add(uVec[k][0]);
+				System.out.println(uVec[k][0]);
 			}
+			System.out.println("-----------------------");
+			listSeries.add(series);
 			U[j] = new Matrix(uVec);
 			V[j] = new Matrix(transp).times(U[j]);
 		}
+		data.setEigenVectors(listSeries);
 		for (int i = 0; i < V.length; i++) {
 			for (int j = 0; j < V[i].getRowDimension(); j++) {
 				for (int k = 0; k < V[i].getColumnDimension(); k++) {
@@ -92,6 +109,11 @@ public class SpectrumAnalysis {
 			}
 		}
 		data.setX(X);
+		for (int i = 0; i < X.length; i++) {
+			Matrix matrix = X[i];
+			System.out.println("rank " + i + "= " + matrix.rank());
+			
+		}
 		/*for (int i = 0; i < X[0].getRowDimension(); i++) {
 		for (int j = 0; j < X[0].getColumnDimension(); j++) {
 		
@@ -172,7 +194,7 @@ public class SpectrumAnalysis {
 		List<Double> lgList = new ArrayList<Double>();
 		List<Double> sqrtList = new ArrayList<Double>();
 		for (int i = 0; i < data.getEigenValueList().size(); i++) {
-			lgList.add(Math.log(data.getEigenValueList().get(i)));
+			lgList.add((Double)Math.log(data.getEigenValueList().get(i)));
 			sqrtList.add(Math.sqrt(data.getEigenValueList().get(i)));
 		}
 		data.setLgEigenValue(lgList);

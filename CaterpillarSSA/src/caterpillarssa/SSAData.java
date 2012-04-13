@@ -19,12 +19,26 @@ public class SSAData {
 	private List<Double> eigenValueList;//собственные числа
 	private List<Double> lgEigenValue;  //логарифмы собственных чисел
 	private List<Double> sqrtEigenValue;//корни собственных чисел
+	private List eigenVectors;			//собственные векторы
+	//для каскадного отображение InternalFrame
+	private int nextFrameX;
+	private int nextFrameY;
+	private int frameDistance;
 	
-
     public SSAData() {
         timeSeries = new ArrayList<Double>();
         L = 2;
     }
+
+	public List getEigenVectors() {
+		return eigenVectors;
+	}
+
+	public void setEigenVectors(List eigenVectors) {
+		this.eigenVectors = eigenVectors;
+	}
+
+
 
     public List<Double> getTimeSeries() {
         return timeSeries;
@@ -97,5 +111,30 @@ public class SSAData {
 	public void setEigenValueList(List<Double> eigenValueList) {
 		this.eigenValueList = eigenValueList;
 	}
-		
+
+	public void setFrameDistance(int frameDistance) {
+		this.frameDistance = frameDistance;
+	}
+
+	public void setNextFrameX(int nextFrameX) {
+		this.nextFrameX = nextFrameX;
+	}
+
+	public void setNextFrameY(int nextFrameY) {
+		this.nextFrameY = nextFrameY;
+	}
+
+	public int getFrameDistance() {
+		return frameDistance;
+	}
+
+	public int getNextFrameX() {
+		return nextFrameX;
+	}
+
+	public int getNextFrameY() {
+		return nextFrameY;
+	}
+	
+	
 }

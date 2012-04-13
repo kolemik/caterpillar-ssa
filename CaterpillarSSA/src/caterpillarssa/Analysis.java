@@ -12,10 +12,10 @@ import javax.swing.JInternalFrame.JDesktopIcon;
 public class Analysis implements ActionListener {
 
     private SSAData data;
-    private java.awt.Frame parent;
+    private javax.swing.JFrame parent;
     private JDesktopPane desctop;
 
-    public Analysis(SSAData data, java.awt.Frame parent, JDesktopPane desctop) {
+    public Analysis(SSAData data, javax.swing.JFrame parent, JDesktopPane desctop) {
         this.data = data;
         this.parent = parent;
         this.desctop = desctop;
