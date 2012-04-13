@@ -12,9 +12,7 @@ public class InternalFrame {
 
     public static JInternalFrame createInternalFrame(ChartPanel chartPanel, String title) {
         JInternalFrame iframe = new JInternalFrame(title, true, true, true, true);
-        iframe.setSize(600, 400);
         iframe.add(chartPanel, BorderLayout.CENTER);
-        iframe.setVisible(true);
         return iframe;
     }
 }

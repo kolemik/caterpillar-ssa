@@ -93,7 +93,9 @@ public class ParamsDialog extends javax.swing.JDialog {
 			final XYPlot plotAvg = avgChart.getChart().getXYPlot();
 			NumberAxis rangeAxisCov = (NumberAxis) plotAvg.getRangeAxis();
 			rangeAxisCov.setRange((Double)Collections.min(data.getCov()), (Double)Collections.max(data.getCov()));
-			
+			desctop.add(secondMomentFrame);
+            FrameParams.setInternalFrameParams(secondMomentFrame, desctop, data);
+
 			listSeries = new ArrayList();
 			seriesTitle = new ArrayList<String>();
 			listSeries.add(data.getSqrtEigenValue());
@@ -102,11 +104,9 @@ public class ParamsDialog extends javax.swing.JDialog {
 			seriesTitle.add("Логарифмы собственных чисел");
 			ChartPanel funcChart = XYChart.createChart(listSeries, "Функции собственных чисел", seriesTitle, "", true);
 			JInternalFrame funcFrame = InternalFrame.createInternalFrame(funcChart, "Функции собственных чисел");
-			//funcFrame.setSize(650, 600);
-			
-			funcFrame.setVisible(true);
-			
-			
+			desctop.add(funcFrame);
+            FrameParams.setInternalFrameParams(funcFrame, desctop, data);
+            
 			JInternalFrame eigenFuncFrame = new JInternalFrame("Собственные функции", true, true, true, true);
 			JPanel panel = new JPanel();
 			panel.setLayout(new GridLayout(2, 2));
@@ -125,21 +125,14 @@ public class ParamsDialog extends javax.swing.JDialog {
 				panel.add(eigenVecListCharts.get(i));
 			}
 			eigenFuncFrame.add(panel);
-			//eigenFuncFrame.setSize(650, 600);
 			eigenFuncFrame.setVisible(true);
-			
-
-			FrameParams.setInternalFrameParams(secondMomentFrame, desctop, data);
-			FrameParams.setInternalFrameParams(funcFrame, desctop, data);
-			FrameParams.setInternalFrameParams(eigenFuncFrame, desctop, data);
-			
+			desctop.add(eigenFuncFrame);
+            FrameParams.setInternalFrameParams(eigenFuncFrame, desctop, data);
 			JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, chart, avgChart);
 			secondMomentFrame.add(splitPane);
-			secondMomentFrame.setVisible(true);
-			desctop.add(secondMomentFrame);
-			desctop.add(funcFrame);
-			desctop.add(eigenFuncFrame);
 			try {
+                eigenFuncFrame.setMaximum(true);
+                funcFrame.setMaximum(true);
 				secondMomentFrame.setMaximum(true);
 			} catch (PropertyVetoException ex) {
 				ex.printStackTrace();

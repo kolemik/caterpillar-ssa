@@ -135,7 +135,7 @@ public class Frame extends javax.swing.JFrame {
 		}
 	}
 
-	private class OpenFile implements ActionListener {
+    private class OpenFile implements ActionListener {
 
 		private SSAData timeSeries;
 
@@ -180,7 +180,7 @@ public class Frame extends javax.swing.JFrame {
 					desctop.add(timeSeriesFrame);
 					FrameParams.setInternalFrameParams(timeSeriesFrame, desctop, data);
 					try {
-						timeSeriesFrame.setMaximum(true);
+                        timeSeriesFrame.setMaximum(true);
 					} catch (PropertyVetoException ex) {
 						ex.printStackTrace();
 					}
@@ -204,8 +204,8 @@ public class Frame extends javax.swing.JFrame {
 					frame.setMaximum(false);
 					frame.reshape(x, y, width, height);
 
-					x += 650;
-					y += 650;
+					x += data.getFrameDistance();
+					y += data.getFrameDistance();
 					// wrap around at the desktop edge
 					if (x + width > desctop.getWidth()) {
 						x = 0;
