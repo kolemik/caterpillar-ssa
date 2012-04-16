@@ -3,6 +3,7 @@ package caterpillarssa;
 import Jama.Matrix;
 import java.util.ArrayList;
 import java.util.List;
+import org.jfree.chart.ChartPanel;
 
 /**
  *
@@ -20,10 +21,17 @@ public class SSAData {
 	private List<Double> lgEigenValue;  //логарифмы собственных чисел
 	private List<Double> sqrtEigenValue;//корни собственных чисел
 	private List eigenVectors;			//собственные векторы
+	private List<Double> percentList;   //проценты собтвенных чисел
+	private List<Double> accruePercentList; //накопленные проценты собственных чисел
+	
 	//для каскадного отображение InternalFrame
 	private int nextFrameX;
 	private int nextFrameY;
 	private int frameDistance;
+	
+	private int eigenFuncPage;
+	private List<ChartPanel> eigenVecListCharts;
+	private List<ChartPanel> mainCompListCharts;
 	
     public SSAData() {
         timeSeries = new ArrayList<Double>();
@@ -37,8 +45,6 @@ public class SSAData {
 	public void setEigenVectors(List eigenVectors) {
 		this.eigenVectors = eigenVectors;
 	}
-
-
 
     public List<Double> getTimeSeries() {
         return timeSeries;
@@ -112,6 +118,23 @@ public class SSAData {
 		this.eigenValueList = eigenValueList;
 	}
 
+	public List<Double> getAccruePercentList() {
+		return accruePercentList;
+	}
+
+	public void setAccruePercentList(List<Double> accruePercentList) {
+		this.accruePercentList = accruePercentList;
+	}
+
+	public List<Double> getPercentList() {
+		return percentList;
+	}
+
+	public void setPercentList(List<Double> percentList) {
+		this.percentList = percentList;
+	}
+
+	
 	public void setFrameDistance(int frameDistance) {
 		this.frameDistance = frameDistance;
 	}
@@ -135,6 +158,29 @@ public class SSAData {
 	public int getNextFrameY() {
 		return nextFrameY;
 	}
-	
+
+	public int getEigenFuncPage() {
+		return eigenFuncPage;
+	}
+
+	public void setEigenFuncPage(int eigenFuncPage) {
+		this.eigenFuncPage = eigenFuncPage;
+	}
+
+	public List<ChartPanel> getEigenVecListCharts() {
+		return eigenVecListCharts;
+	}
+
+	public void setEigenVecListCharts(List<ChartPanel> eigenVecListCharts) {
+		this.eigenVecListCharts = eigenVecListCharts;
+	}
+
+	public List<ChartPanel> getMainCompListCharts() {
+		return mainCompListCharts;
+	}
+
+	public void setMainCompListCharts(List<ChartPanel> mainCompListCharts) {
+		this.mainCompListCharts = mainCompListCharts;
+	}
 	
 }

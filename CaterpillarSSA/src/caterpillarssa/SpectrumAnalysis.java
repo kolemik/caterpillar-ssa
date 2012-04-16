@@ -68,7 +68,24 @@ public class SpectrumAnalysis {
 		 */
 		Collections.sort(eigenvalueList,comparator);
 		data.setEigenValueList(eigenvalueList);
-
+		double sumValueList = 0;
+		List<Double> percentList;
+		List<Double> accruePercentList;
+		for (int i = 0; i < data.getEigenValueList().size(); i++) {
+			sumValueList = sumValueList + data.getEigenValueList().get(i);
+		}
+		//формирование процентов собственных чисел и накопленных процентов
+		percentList = new ArrayList<Double>();
+		accruePercentList = new ArrayList<Double>();
+		double accruePercent = 0;
+		for (int i = 0; i < data.getEigenValueList().size(); i++) {
+			percentList.add(data.getEigenValueList().get(i) / sumValueList * 100);
+			accruePercent += percentList.get(i);
+			accruePercentList.add(accruePercent);
+		}
+		data.setAccruePercentList(accruePercentList);
+		data.setPercentList(percentList);
+		
 		Matrix V[] = new Matrix[d];
 		Matrix U[] = new Matrix[d];
 		Matrix X[] = new Matrix[d]; //элементарные матрицы сингулярного разложения
@@ -109,19 +126,19 @@ public class SpectrumAnalysis {
 			}
 		}
 		data.setX(X);
-		for (int i = 0; i < X.length; i++) {
+		/*for (int i = 0; i < X.length; i++) {
 			Matrix matrix = X[i];
-			System.out.println("rank " + i + "= " + matrix.rank());
+			//System.out.println("rank " + i + "= " + matrix.rank() + " " + matrix.getRowDimension() + " " + matrix.getColumnDimension());
 			
 		}
-		/*for (int i = 0; i < X[0].getRowDimension(); i++) {
+		for (int i = 0; i < X[0].getRowDimension(); i++) {
 		for (int j = 0; j < X[0].getColumnDimension(); j++) {
 		
-		System.out.print(X[0].get(i, j));
+		System.out.print(X[0].get(i, j) + " ");
 		}
 		System.out.println();
 		}*/
-		// System.out.println(X[0].getColumnDimension() + " " + X[0].getRowDimension() + " " + X[0].rank());
+
 	}
 
 	/**

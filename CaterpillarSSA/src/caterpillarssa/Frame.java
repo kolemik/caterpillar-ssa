@@ -45,7 +45,6 @@ public class Frame extends javax.swing.JFrame {
 	private UIManager.LookAndFeelInfo l[];
 	private SSAData data;
 
-
 	/** Creates new form Frame */
 	public Frame() {
 		initComponents();
@@ -103,7 +102,35 @@ public class Frame extends javax.swing.JFrame {
 			}
 		});
 		openToolBar.addActionListener(new OpenFile(data));
+		backChart.addActionListener(new ActionListener() {
 
+			public void actionPerformed(ActionEvent e) {
+				JInternalFrame frame = desctop.getSelectedFrame();
+				if (frame.getName().equals("eigenFunc")) {
+					int currentNum = data.getEigenFuncPage();
+					if (((currentNum - 1) * 4) >= 0) {
+						currentNum--;
+						data.setEigenFuncPage(currentNum);
+						FrameParams.updateInternalFrame(frame, data.getEigenFuncPage(), data.getEigenVecListCharts());
+					}
+				}
+			}
+		});
+		nextChart.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent e) {
+				JInternalFrame frame = desctop.getSelectedFrame();
+				if (frame.getName().equals("eigenFunc")) {
+					int currentNum = data.getEigenFuncPage();
+					if ((((currentNum * 4) + 4) < data.getEigenVecListCharts().size() && (((currentNum + 1) * 4 + 4)) >= data.getEigenVecListCharts().size())
+							|| (((currentNum + 1) * 4) < data.getEigenVecListCharts().size())) {
+						currentNum++;
+						data.setEigenFuncPage(currentNum);
+						FrameParams.updateInternalFrame(frame, data.getEigenFuncPage(), data.getEigenVecListCharts());
+					}
+				}
+			}
+		});
 	}
 
 	/**
@@ -135,7 +162,7 @@ public class Frame extends javax.swing.JFrame {
 		}
 	}
 
-    private class OpenFile implements ActionListener {
+	private class OpenFile implements ActionListener {
 
 		private SSAData timeSeries;
 
@@ -180,7 +207,7 @@ public class Frame extends javax.swing.JFrame {
 					desctop.add(timeSeriesFrame);
 					FrameParams.setInternalFrameParams(timeSeriesFrame, desctop, data);
 					try {
-                        timeSeriesFrame.setMaximum(true);
+						timeSeriesFrame.setMaximum(true);
 					} catch (PropertyVetoException ex) {
 						ex.printStackTrace();
 					}
@@ -271,6 +298,7 @@ public class Frame extends javax.swing.JFrame {
 		JInternalFrame[] frames = desctop.getAllFrames();
 		for (int i = 0; i < frames.length; i++) {
 			if (frames[i].isSelected()) {
+				System.out.println(frames[i].getName());
 				// find next frame that isn't an icon and can be selected
 				int next = (i + 1) % frames.length;
 				while (next != i) {
@@ -289,9 +317,9 @@ public class Frame extends javax.swing.JFrame {
 			}
 		}
 	}
-	
-	//public void
 
+	//private
+	//public void
 	/** This method is called from within the constructor to
 	 * initialize the form.
 	 * WARNING: Do NOT modify this code. The content of this method is
@@ -306,6 +334,8 @@ public class Frame extends javax.swing.JFrame {
         nextToolBar = new javax.swing.JButton();
         cascadeToolBar = new javax.swing.JButton();
         tileToolBar = new javax.swing.JButton();
+        backChart = new javax.swing.JButton();
+        nextChart = new javax.swing.JButton();
         desctop = new javax.swing.JDesktopPane();
         jMenuBar1 = new javax.swing.JMenuBar();
         fileItem = new javax.swing.JMenu();
@@ -340,7 +370,6 @@ public class Frame extends javax.swing.JFrame {
         cascadeToolBar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image/cascade.png"))); // NOI18N
         cascadeToolBar.setFocusable(false);
         cascadeToolBar.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        cascadeToolBar.setLabel("");
         cascadeToolBar.setMargin(new java.awt.Insets(3, 3, 3, 3));
         cascadeToolBar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         toolBar.add(cascadeToolBar);
@@ -351,6 +380,18 @@ public class Frame extends javax.swing.JFrame {
         tileToolBar.setMargin(new java.awt.Insets(3, 3, 3, 3));
         tileToolBar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         toolBar.add(tileToolBar);
+
+        backChart.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image/2left.png"))); // NOI18N
+        backChart.setFocusable(false);
+        backChart.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        backChart.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        toolBar.add(backChart);
+
+        nextChart.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image/2right.png"))); // NOI18N
+        nextChart.setFocusable(false);
+        nextChart.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        nextChart.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        toolBar.add(nextChart);
 
         fileItem.setText("Файл");
 
@@ -419,6 +460,7 @@ public class Frame extends javax.swing.JFrame {
     }//GEN-LAST:event_analysisItemActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem analysisItem;
+    private javax.swing.JButton backChart;
     private javax.swing.JMenu calcItem;
     private javax.swing.JButton cascadeToolBar;
     private javax.swing.JDesktopPane desctop;
@@ -429,6 +471,7 @@ public class Frame extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JPopupMenu.Separator jSeparator1;
+    private javax.swing.JButton nextChart;
     private javax.swing.JButton nextToolBar;
     private javax.swing.JMenuItem openFileItem;
     private javax.swing.JButton openToolBar;

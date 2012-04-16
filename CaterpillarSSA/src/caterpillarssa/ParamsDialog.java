@@ -5,6 +5,7 @@
  */
 package caterpillarssa;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
@@ -14,12 +15,17 @@ import java.beans.PropertyVetoException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
+import javax.swing.JToolBar;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.UIManager;
+import javax.swing.event.InternalFrameAdapter;
+import javax.swing.event.InternalFrameEvent;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.XYPlot;
@@ -35,6 +41,7 @@ public class ParamsDialog extends javax.swing.JDialog {
 	private SSAData data;
 	private JDesktopPane desctop;
 	private javax.swing.JFrame parent;
+	
 
 	/** Creates new form ParamsDialog */
 	public ParamsDialog(javax.swing.JFrame parent, boolean modal, SSAData data, JDesktopPane desctop) {
@@ -67,8 +74,14 @@ public class ParamsDialog extends javax.swing.JDialog {
 	private class OKPressListener implements ActionListener {
 
 		public void actionPerformed(ActionEvent e) {
+			JInternalFrame frames[] = desctop.getAllFrames();
+			for (int i = 0; i < frames.length; i++) {
+				frames[i].dispose();
+			}
+			
 			ArrayList listSeries;
 			List<String> seriesTitle;
+			JPanel panel;
 			
 			data.setL((Integer) lengthWindowControl.getValue());
 			SpectrumAnalysis.inclosure(data);
@@ -76,9 +89,9 @@ public class ParamsDialog extends javax.swing.JDialog {
 			SpectrumAnalysis.setMovingAvarege(data);
 			SpectrumAnalysis.averagedCovariance(data);
 			SpectrumAnalysis.functionEigenValue(data);
-			
+
 			JInternalFrame secondMomentFrame = new JInternalFrame("Вторые моменты", true, true, true, true);
-			
+
 			listSeries = new ArrayList();
 			seriesTitle = new ArrayList<String>();
 			listSeries.add(data.getSMA());
@@ -92,10 +105,23 @@ public class ParamsDialog extends javax.swing.JDialog {
 			ChartPanel avgChart = XYChart.createChart(listSeries, "Осреднённые ковариации", seriesTitle, "", true);
 			final XYPlot plotAvg = avgChart.getChart().getXYPlot();
 			NumberAxis rangeAxisCov = (NumberAxis) plotAvg.getRangeAxis();
-			rangeAxisCov.setRange((Double)Collections.min(data.getCov()), (Double)Collections.max(data.getCov()));
+			rangeAxisCov.setRange((Double) Collections.min(data.getCov()), (Double) Collections.max(data.getCov()));
+			JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, chart, avgChart);
+			secondMomentFrame.add(splitPane);
 			desctop.add(secondMomentFrame);
-            FrameParams.setInternalFrameParams(secondMomentFrame, desctop, data);
+			FrameParams.setInternalFrameParams(secondMomentFrame, desctop, data);
 
+			listSeries = new ArrayList();
+			seriesTitle = new ArrayList<String>();
+			listSeries.add(data.getPercentList());
+			listSeries.add(data.getAccruePercentList());
+			seriesTitle.add("Проценты собственных чисел");
+			seriesTitle.add("Накопленные проценты");
+			ChartPanel percentChart = XYChart.createChart(listSeries, "Собственные числа в процентах", seriesTitle, "", true);
+			JInternalFrame percentFrame = InternalFrame.createInternalFrame(percentChart, "Собственные числа в процентах");
+			desctop.add(percentFrame);
+			FrameParams.setInternalFrameParams(percentFrame, desctop, data);
+			
 			listSeries = new ArrayList();
 			seriesTitle = new ArrayList<String>();
 			listSeries.add(data.getSqrtEigenValue());
@@ -105,39 +131,68 @@ public class ParamsDialog extends javax.swing.JDialog {
 			ChartPanel funcChart = XYChart.createChart(listSeries, "Функции собственных чисел", seriesTitle, "", true);
 			JInternalFrame funcFrame = InternalFrame.createInternalFrame(funcChart, "Функции собственных чисел");
 			desctop.add(funcFrame);
-            FrameParams.setInternalFrameParams(funcFrame, desctop, data);
-            
+			FrameParams.setInternalFrameParams(funcFrame, desctop, data);
+
 			JInternalFrame eigenFuncFrame = new JInternalFrame("Собственные функции", true, true, true, true);
-			JPanel panel = new JPanel();
+			eigenFuncFrame.setName("eigenFunc");
+			eigenFuncFrame.addInternalFrameListener(new InternalFrameAdapter() {
+
+				@Override
+				public void internalFrameActivated(InternalFrameEvent e) {
+
+				}
+			});
+			panel = new JPanel();
 			panel.setLayout(new GridLayout(2, 2));
 			List<ChartPanel> eigenVecListCharts = new ArrayList<ChartPanel>();
-			for (int i = 0; i < data.getEigenVectors().size(); i++) {
-				listSeries = new ArrayList();
-				seriesTitle = new ArrayList<String>();
-				seriesTitle.add("" + (i + 1));
-				ArrayList list = (ArrayList)data.getEigenVectors().get(i);
-				listSeries.add(list);
-				ChartPanel eigenVecChart  = XYChart.createChart(listSeries, ("" + i), seriesTitle, "", true);
-				final XYPlot eigenVecPlot = eigenVecChart.getChart().getXYPlot();
-				NumberAxis rangeAxisVec = (NumberAxis) eigenVecPlot.getRangeAxis();
-				rangeAxisVec.setRange((Double)Collections.min(list), (Double)Collections.max(list));			
-				eigenVecListCharts.add(eigenVecChart);
+			setEigenChartList(listSeries, seriesTitle, eigenVecListCharts, data.getEigenVectors());
+			data.setEigenVecListCharts(eigenVecListCharts);
+			for (int i = 0; i < 4; i++) {
 				panel.add(eigenVecListCharts.get(i));
 			}
-			eigenFuncFrame.add(panel);
+			eigenFuncFrame.add(panel, BorderLayout.CENTER);
 			eigenFuncFrame.setVisible(true);
 			desctop.add(eigenFuncFrame);
-            FrameParams.setInternalFrameParams(eigenFuncFrame, desctop, data);
-			JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, chart, avgChart);
-			secondMomentFrame.add(splitPane);
+			FrameParams.setInternalFrameParams(eigenFuncFrame, desctop, data);
+			
+			JInternalFrame mainComponentFrame = new JInternalFrame("Главные компоненты", true, true, true, true);
+			mainComponentFrame.setName("mainComponent");
+			panel = new JPanel();
+			panel.setLayout(new GridLayout(2, 2));
+			List<ChartPanel> mainCompListCharts = new ArrayList<ChartPanel>();
+			//setEigenChartList(listSeries, seriesTitle, mainCompListCharts, data.getEigenVectors());
+
 			try {
-                eigenFuncFrame.setMaximum(true);
-                funcFrame.setMaximum(true);
+				eigenFuncFrame.setMaximum(true);
+				funcFrame.setMaximum(true);
+				percentFrame.setMaximum(true);
 				secondMomentFrame.setMaximum(true);
 			} catch (PropertyVetoException ex) {
 				ex.printStackTrace();
 			}
 			ParamsDialog.this.setVisible(false);
+		}
+	}
+
+	/**
+	 * 
+	 * @param listSeries коллекция с данными для одного графика
+	 * @param seriesTitle заголовки графиков
+	 * @param charts графики
+	 * @param data коллекция с данными для каждого из графиков (если их несколько на одном InternalFrame)
+	 */
+	private void setEigenChartList(ArrayList listSeries, List<String> seriesTitle, List<ChartPanel> charts, List data) {
+		for (int i = 0; i < data.size(); i++) {
+			listSeries = new ArrayList();
+			seriesTitle = new ArrayList<String>();
+			seriesTitle.add("" + (i + 1));
+			ArrayList list = (ArrayList) data.get(i);
+			listSeries.add(list);
+			ChartPanel chartPanel = XYChart.createChart(listSeries, ("" + (i + 1)), seriesTitle, "", true);
+			final XYPlot plot = chartPanel.getChart().getXYPlot();
+			NumberAxis rangeAxisVec = (NumberAxis) plot.getRangeAxis();
+			rangeAxisVec.setRange((Double) Collections.min(list), (Double) Collections.max(list));
+			charts.add(chartPanel);
 		}
 	}
 
@@ -147,8 +202,6 @@ public class ParamsDialog extends javax.swing.JDialog {
 			ParamsDialog.this.setVisible(false);
 		}
 	}
-	
-
 
 	/** This method is called from within the constructor to
 	 * initialize the form.
@@ -261,22 +314,6 @@ public class ParamsDialog extends javax.swing.JDialog {
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
 		// TODO add your handling code here:
     }//GEN-LAST:event_cancelButtonActionPerformed
-	/**
-	 * @param args the command line arguments
-	 */
-	/*public static void main(String args[]) {
-	java.awt.EventQueue.invokeLater(new Runnable() {
-	public void run() {
-	ParamsDialog dialog = new ParamsDialog(new javax.swing.JFrame(), true);
-	dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-	public void windowClosing(java.awt.event.WindowEvent e) {
-	System.exit(0);
-	}
-	});
-	dialog.setVisible(true);
-	}
-	});
-	}*/
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cancelButton;
     private javax.swing.JLabel countPoint;
