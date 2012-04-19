@@ -1,6 +1,5 @@
 package caterpillarssa;
 
-import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.util.List;
 import javax.swing.JDesktopPane;
@@ -10,18 +9,18 @@ import org.jfree.chart.ChartPanel;
 
 /**
  *
- * @author vaskin
+ * @author Васькин Александр
  */
 public class FrameParams {
 
 	public static void setInternalFrameParams(JInternalFrame iframe, JDesktopPane desctop, SSAData data) {
-		// position frame
+		//расположение фрейма
 		int width = desctop.getWidth() / 2;
 		int height = desctop.getHeight() / 2;
 		iframe.reshape(data.getNextFrameX(), data.getNextFrameY(), width, height);
 		iframe.show();
 		data.setFrameDistance(iframe.getHeight() - iframe.getContentPane().getHeight());
-		// compute placement for next frame
+		//вычисляем расположение следующего фрейма
 		data.setNextFrameX(data.getNextFrameX() + data.getFrameDistance());
 		data.setNextFrameY(data.getNextFrameY() + data.getFrameDistance());
 		if (data.getNextFrameX() + width > desctop.getWidth()) {
