@@ -21,27 +21,18 @@ import org.jfree.ui.RectangleEdge;
 public class XYChart {
 
     public static ChartPanel createChart(List data, String title, List<String> seriesTitle, String fileName, boolean shapeRenderer) {
-		final XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
+        final XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
         XYSeriesCollection dataset = new XYSeriesCollection();
-		System.out.println(data.size());
-		for (int i = 0; i < data.size(); i++) {
-			XYSeries series = new XYSeries(seriesTitle.get(i));
-			ArrayList list = (ArrayList)data.get(i);
-			System.out.println(data.size() + " " + i + " " + seriesTitle.get(i));
-			for (int j = 0; j < list.size(); j++) {
-				series.add(j, (Double)list.get(j));
-			}
-			dataset.addSeries(series);
-			
-		}
-        /*Iterator itr = data.iterator();
-        int i = 0;
-        while(itr.hasNext()) {
-            i++;
-            series.add(i, (Double)itr.next());
-        }*/
-       
-        
+        for (int i = 0; i < data.size(); i++) {
+            XYSeries series = new XYSeries(seriesTitle.get(i));
+            ArrayList list = (ArrayList) data.get(i);
+            for (int j = 0; j < list.size(); j++) {
+                series.add(j, (Double) list.get(j));
+            }
+            dataset.addSeries(series);
+
+        }
+
         JFreeChart chart = ChartFactory.createXYLineChart(
                 title,
                 "",
@@ -51,21 +42,21 @@ public class XYChart {
                 true,
                 true,
                 false);
-        if(!title.equals("")) {
+        if (!title.equals("")) {
             TextTitle source = new TextTitle(fileName);
             source.setFont(new Font("SanSerif", Font.PLAIN, 12));
             source.setPosition(RectangleEdge.TOP);
             chart.addSubtitle(source);
         }
         chart.getTitle().setFont(new Font("Tahoma", Font.PLAIN, 13));
-		final XYPlot plot = chart.getXYPlot();
-		if(shapeRenderer) {					
-			plot.setRenderer(renderer);
-		}
-		ChartPanel chartPanel = new ChartPanel(chart);
-		chartPanel.setMouseWheelEnabled(true);
-		chartPanel.setDisplayToolTips(true);
-		chartPanel.setInitialDelay(0);
+        final XYPlot plot = chart.getXYPlot();
+        if (shapeRenderer) {
+            plot.setRenderer(renderer);
+        }
+        ChartPanel chartPanel = new ChartPanel(chart);
+        chartPanel.setMouseWheelEnabled(true);
+        chartPanel.setDisplayToolTips(true);
+        chartPanel.setInitialDelay(0);
         return chartPanel;
     }
 }

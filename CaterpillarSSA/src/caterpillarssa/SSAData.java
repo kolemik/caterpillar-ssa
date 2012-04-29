@@ -15,36 +15,46 @@ public class SSAData {
     private int L;						//длина окна
     private double inclosureMatrix[][]; //матрица вложений
     private Matrix X[];			//элементарные матрицы сингулярного разложения
-	private List<Double> SMA;			//скользящие средние
-	private List<Double> cov;			//диагональное осреднение ковариаций
-	private List<Double> eigenValueList;//собственные числа
-	private List<Double> lgEigenValue;  //логарифмы собственных чисел
-	private List<Double> sqrtEigenValue;//корни собственных чисел
-	private List eigenVectors;			//собственные векторы
-	private List<Double> percentList;   //проценты собтвенных чисел
-	private List<Double> accruePercentList; //накопленные проценты собственных чисел
-	
-	//для каскадного отображение InternalFrame
-	private int nextFrameX;
-	private int nextFrameY;
-	private int frameDistance;
-	
-	private int eigenFuncPage;
-	private List<ChartPanel> eigenVecListCharts;
-	private List<ChartPanel> mainCompListCharts;
-	
+    private Matrix V[];
+    private List<Double> SMA;			//скользящие средние
+    private List<Double> cov;			//диагональное осреднение ковариаций
+    private List<Double> eigenValueList;//собственные числа
+    private List<Double> lgEigenValue;  //логарифмы собственных чисел
+    private List<Double> sqrtEigenValue;//корни собственных чисел
+    private List eigenVectors;			//собственные векторы
+    private List<Double> percentList;   //проценты собтвенных чисел
+    private List<Double> accruePercentList; //накопленные проценты собственных чисел
+    /*
+     * для каскадного отображение InternalFrame
+     */
+    private int nextFrameX;
+    private int nextFrameY;
+    private int frameDistance;
+    private int eigenFuncPage;
+    private int mainCompPage;
+    private List<ChartPanel> eigenVecListCharts;
+    private List<ChartPanel> mainCompListCharts;
+
     public SSAData() {
         timeSeries = new ArrayList<Double>();
         L = 2;
     }
 
-	public List getEigenVectors() {
-		return eigenVectors;
-	}
+    public List getEigenVectors() {
+        return eigenVectors;
+    }
 
-	public void setEigenVectors(List eigenVectors) {
-		this.eigenVectors = eigenVectors;
-	}
+    public void setEigenVectors(List eigenVectors) {
+        this.eigenVectors = eigenVectors;
+    }
+
+    public Matrix[] getV() {
+        return V;
+    }
+
+    public void setV(Matrix[] V) {
+        this.V = V;
+    }
 
     public List<Double> getTimeSeries() {
         return timeSeries;
@@ -73,114 +83,120 @@ public class SSAData {
     public Matrix[] getX() {
         return X;
     }
-	
+
     public void setX(Matrix X[]) {
         this.X = X;
     }
-	
-	public List<Double> getSMA() {
-		return SMA;
-	}
-	
-	public void setSMA(List<Double> SMA) {
-		this.SMA = SMA;
-	}
-	
-	public List<Double> getCov() {
-		return cov;
-	}
-	
-	public void setCov(List<Double> cov) {
-		this.cov = cov;
-	}
-	
-	public void setLgEigenValue(List<Double> lgEigenValue) {
-		this.lgEigenValue = lgEigenValue;
-	}
-	
-	public List<Double> getLgEigenValue() {
-		return lgEigenValue;
-	}
-	
-	public void setSqrtEigenValue(List<Double> sqrtEigenValue) {
-		this.sqrtEigenValue = sqrtEigenValue;
-	}
-	
-	public List<Double> getSqrtEigenValue() {
-		return sqrtEigenValue;
-	}
 
-	public List<Double> getEigenValueList() {
-		return eigenValueList;
-	}
+    public List<Double> getSMA() {
+        return SMA;
+    }
 
-	public void setEigenValueList(List<Double> eigenValueList) {
-		this.eigenValueList = eigenValueList;
-	}
+    public void setSMA(List<Double> SMA) {
+        this.SMA = SMA;
+    }
 
-	public List<Double> getAccruePercentList() {
-		return accruePercentList;
-	}
+    public List<Double> getCov() {
+        return cov;
+    }
 
-	public void setAccruePercentList(List<Double> accruePercentList) {
-		this.accruePercentList = accruePercentList;
-	}
+    public void setCov(List<Double> cov) {
+        this.cov = cov;
+    }
 
-	public List<Double> getPercentList() {
-		return percentList;
-	}
+    public void setLgEigenValue(List<Double> lgEigenValue) {
+        this.lgEigenValue = lgEigenValue;
+    }
 
-	public void setPercentList(List<Double> percentList) {
-		this.percentList = percentList;
-	}
+    public List<Double> getLgEigenValue() {
+        return lgEigenValue;
+    }
 
-	
-	public void setFrameDistance(int frameDistance) {
-		this.frameDistance = frameDistance;
-	}
+    public void setSqrtEigenValue(List<Double> sqrtEigenValue) {
+        this.sqrtEigenValue = sqrtEigenValue;
+    }
 
-	public void setNextFrameX(int nextFrameX) {
-		this.nextFrameX = nextFrameX;
-	}
+    public List<Double> getSqrtEigenValue() {
+        return sqrtEigenValue;
+    }
 
-	public void setNextFrameY(int nextFrameY) {
-		this.nextFrameY = nextFrameY;
-	}
+    public List<Double> getEigenValueList() {
+        return eigenValueList;
+    }
 
-	public int getFrameDistance() {
-		return frameDistance;
-	}
+    public void setEigenValueList(List<Double> eigenValueList) {
+        this.eigenValueList = eigenValueList;
+    }
 
-	public int getNextFrameX() {
-		return nextFrameX;
-	}
+    public List<Double> getAccruePercentList() {
+        return accruePercentList;
+    }
 
-	public int getNextFrameY() {
-		return nextFrameY;
-	}
+    public void setAccruePercentList(List<Double> accruePercentList) {
+        this.accruePercentList = accruePercentList;
+    }
 
-	public int getEigenFuncPage() {
-		return eigenFuncPage;
-	}
+    public List<Double> getPercentList() {
+        return percentList;
+    }
 
-	public void setEigenFuncPage(int eigenFuncPage) {
-		this.eigenFuncPage = eigenFuncPage;
-	}
+    public void setPercentList(List<Double> percentList) {
+        this.percentList = percentList;
+    }
 
-	public List<ChartPanel> getEigenVecListCharts() {
-		return eigenVecListCharts;
-	}
+    public void setFrameDistance(int frameDistance) {
+        this.frameDistance = frameDistance;
+    }
 
-	public void setEigenVecListCharts(List<ChartPanel> eigenVecListCharts) {
-		this.eigenVecListCharts = eigenVecListCharts;
-	}
+    public void setNextFrameX(int nextFrameX) {
+        this.nextFrameX = nextFrameX;
+    }
 
-	public List<ChartPanel> getMainCompListCharts() {
-		return mainCompListCharts;
-	}
+    public void setNextFrameY(int nextFrameY) {
+        this.nextFrameY = nextFrameY;
+    }
 
-	public void setMainCompListCharts(List<ChartPanel> mainCompListCharts) {
-		this.mainCompListCharts = mainCompListCharts;
-	}
-	
+    public int getFrameDistance() {
+        return frameDistance;
+    }
+
+    public int getNextFrameX() {
+        return nextFrameX;
+    }
+
+    public int getNextFrameY() {
+        return nextFrameY;
+    }
+
+    public int getEigenFuncPage() {
+        return eigenFuncPage;
+    }
+
+    public void setEigenFuncPage(int eigenFuncPage) {
+        this.eigenFuncPage = eigenFuncPage;
+    }
+
+    public List<ChartPanel> getEigenVecListCharts() {
+        return eigenVecListCharts;
+    }
+
+    public void setEigenVecListCharts(List<ChartPanel> eigenVecListCharts) {
+        this.eigenVecListCharts = eigenVecListCharts;
+    }
+
+    public List<ChartPanel> getMainCompListCharts() {
+        return mainCompListCharts;
+    }
+
+    public void setMainCompListCharts(List<ChartPanel> mainCompListCharts) {
+        this.mainCompListCharts = mainCompListCharts;
+    }
+
+    public int getMainCompPage() {
+        return mainCompPage;
+    }
+
+    public void setMainCompPage(int mainCompPage) {
+        this.mainCompPage = mainCompPage;
+    }
 }

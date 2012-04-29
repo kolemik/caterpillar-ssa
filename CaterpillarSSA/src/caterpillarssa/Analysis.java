@@ -3,7 +3,6 @@ package caterpillarssa;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JDesktopPane;
-import javax.swing.JInternalFrame.JDesktopIcon;
 
 /**
  *
@@ -22,8 +21,7 @@ public class Analysis implements ActionListener {
     }
 
     public void actionPerformed(ActionEvent e) {
-            ParamsDialog dialog = new ParamsDialog(parent, true, data, desctop);
-            dialog.setVisible(true);
+        ParamsDialog dialog = new ParamsDialog(parent, true, data, desctop);
+        dialog.setVisible(true);
     }
-
 }

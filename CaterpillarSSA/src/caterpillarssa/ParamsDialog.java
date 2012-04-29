@@ -28,6 +28,7 @@ import javax.swing.event.InternalFrameEvent;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 
 /**
  *
@@ -74,6 +75,7 @@ public class ParamsDialog extends javax.swing.JDialog {
     private class OKPressListener implements ActionListener {
 
         public void actionPerformed(ActionEvent e) {
+            //удаляем все internal frames
             JInternalFrame frames[] = desctop.getAllFrames();
             for (int i = 0; i < frames.length; i++) {
                 frames[i].dispose();
@@ -82,6 +84,7 @@ public class ParamsDialog extends javax.swing.JDialog {
             ArrayList listSeries;
             List<String> seriesTitle;
             JPanel panel;
+            int firstCharts = 0;
 
             data.setL((Integer) lengthWindowControl.getValue());
             SpectrumAnalysis.inclosure(data);
@@ -154,7 +157,13 @@ public class ParamsDialog extends javax.swing.JDialog {
             List<ChartPanel> eigenVecListCharts = new ArrayList<ChartPanel>();
             setEigenChartList(listSeries, seriesTitle, eigenVecListCharts, data.getEigenVectors());
             data.setEigenVecListCharts(eigenVecListCharts);
-            for (int i = 0; i < 4; i++) {
+
+            if (eigenVecListCharts.size() >= 4) {
+                firstCharts = 4;
+            } else {
+                firstCharts = eigenVecListCharts.size();
+            }
+            for (int i = 0; i < firstCharts; i++) {
                 panel.add(eigenVecListCharts.get(i));
             }
             eigenFuncFrame.add(panel, BorderLayout.CENTER);
@@ -164,12 +173,41 @@ public class ParamsDialog extends javax.swing.JDialog {
 
             JInternalFrame mainComponentFrame = new JInternalFrame("Главные компоненты", true, true, true, true);
             mainComponentFrame.setName("mainComponent");
+            mainComponentFrame.addInternalFrameListener(new InternalFrameAdapter() {
+
+                @Override
+                public void internalFrameActivated(InternalFrameEvent e) {
+                    parent.getNextChart().setEnabled(true);
+                    parent.getBackChart().setEnabled(true);
+                }
+
+                @Override
+                public void internalFrameDeactivated(InternalFrameEvent e) {
+                    parent.getNextChart().setEnabled(false);
+                    parent.getBackChart().setEnabled(false);
+                }
+            });
             panel = new JPanel();
             panel.setLayout(new GridLayout(2, 2));
             List<ChartPanel> mainCompListCharts = new ArrayList<ChartPanel>();
+            setMainCompChartList(listSeries, seriesTitle, mainCompListCharts);
+            data.setMainCompListCharts(mainCompListCharts);
+            if (mainCompListCharts.size() >= 4) {
+                firstCharts = 4;
+            } else {
+                firstCharts = mainCompListCharts.size();
+            }
+            for (int i = 0; i < firstCharts; i++) {
+                panel.add(mainCompListCharts.get(i));
+            }
+            mainComponentFrame.add(panel, BorderLayout.CENTER);
+            mainComponentFrame.setVisible(true);
+            desctop.add(mainComponentFrame);
+            FrameParams.setInternalFrameParams(mainComponentFrame, desctop, data);
             //setEigenChartList(listSeries, seriesTitle, mainCompListCharts, data.getEigenVectors());
 
             try {
+                mainComponentFrame.setMaximum(true);
                 eigenFuncFrame.setMaximum(true);
                 funcFrame.setMaximum(true);
                 percentFrame.setMaximum(true);
@@ -200,6 +238,31 @@ public class ParamsDialog extends javax.swing.JDialog {
             listSeries.add(list);
             ChartPanel chartPanel = XYChart.createChart(listSeries, ("" + (i + 1) + " (" + num + "%)"), seriesTitle, "", true);
             final XYPlot plot = chartPanel.getChart().getXYPlot();
+            NumberAxis rangeAxisVec = (NumberAxis) plot.getRangeAxis();
+            rangeAxisVec.setRange((Double) Collections.min(list), (Double) Collections.max(list));
+            charts.add(chartPanel);
+        }
+    }
+
+    private void setMainCompChartList(ArrayList listSeries, List<String> seriesTitle, List<ChartPanel> charts) {
+        for (int i = 0; i < data.getV().length; i++) {
+            BigDecimal percent = new BigDecimal(data.getPercentList().get(i));
+            double num = percent.setScale(2, RoundingMode.HALF_EVEN).doubleValue();
+            listSeries = new ArrayList();
+            seriesTitle = new ArrayList<String>();
+            seriesTitle.add("" + (i + 1));
+            List<Double> list = new ArrayList<Double>();
+            for (int j = 0; j < data.getV()[i].getRowDimension(); j++) {
+                for (int k = 0; k < data.getV()[i].getColumnDimension(); k++) {
+                    list.add(data.getV()[i].get(j, k));
+                }
+            }
+            listSeries.add(list);
+            ChartPanel chartPanel = XYChart.createChart(listSeries, ("" + (i + 1) + " (" + num + "%)"), seriesTitle, "", true);
+            final XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
+            final XYPlot plot = chartPanel.getChart().getXYPlot();
+            renderer.setSeriesShapesVisible(0, false);
+            plot.setRenderer(renderer);
             NumberAxis rangeAxisVec = (NumberAxis) plot.getRangeAxis();
             rangeAxisVec.setRange((Double) Collections.min(list), (Double) Collections.max(list));
             charts.add(chartPanel);

@@ -100,6 +100,14 @@ public class Frame extends javax.swing.JFrame {
 						FrameParams.updateInternalFrame(frame, data.getEigenFuncPage(), data.getEigenVecListCharts());
 					}
 				}
+                if (frame.getName().equals("mainComponent")) {
+					int currentNum = data.getMainCompPage();
+					if (((currentNum - 1) * 4) >= 0) {
+						currentNum--;
+						data.setMainCompPage(currentNum);
+						FrameParams.updateInternalFrame(frame, data.getMainCompPage(), data.getMainCompListCharts());
+					}
+				}
 			}
 		});
 		nextChart.addActionListener(new ActionListener() {
@@ -113,6 +121,15 @@ public class Frame extends javax.swing.JFrame {
 						currentNum++;
 						data.setEigenFuncPage(currentNum);
 						FrameParams.updateInternalFrame(frame, data.getEigenFuncPage(), data.getEigenVecListCharts());
+					}
+				}
+                if (frame.getName().equals("mainComponent")) {
+					int currentNum = data.getMainCompPage();
+					if ((((currentNum * 4) + 4) < data.getMainCompListCharts().size() && (((currentNum + 1) * 4 + 4)) >= data.getMainCompListCharts().size())
+							|| (((currentNum + 1) * 4) < data.getMainCompListCharts().size())) {
+						currentNum++;
+						data.setMainCompPage(currentNum);
+						FrameParams.updateInternalFrame(frame, data.getMainCompPage(), data.getMainCompListCharts());
 					}
 				}
 			}
@@ -292,7 +309,6 @@ public class Frame extends javax.swing.JFrame {
 		JInternalFrame[] frames = desctop.getAllFrames();
 		for (int i = 0; i < frames.length; i++) {
 			if (frames[i].isSelected()) {
-				System.out.println(frames[i].getName());
 				// find next frame that isn't an icon and can be selected
 				int next = (i + 1) % frames.length;
 				while (next != i) {
