@@ -1,13 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/*
- * Frame.java
- *
- * Created on 27.02.2012, 22:41:44
- */
 package caterpillarssa;
 
 import java.awt.Dimension;
@@ -22,11 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-import javax.swing.ImageIcon;
-import javax.swing.JFileChooser;
-import javax.swing.JInternalFrame;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
+import javax.swing.*;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 import org.jfree.chart.ChartPanel;
@@ -132,6 +118,14 @@ public class Frame extends javax.swing.JFrame {
 			}
 		});
 	}
+
+    public JButton getBackChart() {
+        return backChart;
+    }
+
+    public JButton getNextChart() {
+        return nextChart;
+    }
 
 	/**
 	 * метод, центрирующий приложение на экране
@@ -382,12 +376,14 @@ public class Frame extends javax.swing.JFrame {
         toolBar.add(tileToolBar);
 
         backChart.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image/2left.png"))); // NOI18N
+        backChart.setEnabled(false);
         backChart.setFocusable(false);
         backChart.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         backChart.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         toolBar.add(backChart);
 
         nextChart.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image/2right.png"))); // NOI18N
+        nextChart.setEnabled(false);
         nextChart.setFocusable(false);
         nextChart.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         nextChart.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);

@@ -57,6 +57,7 @@ public class XYChart {
             source.setPosition(RectangleEdge.TOP);
             chart.addSubtitle(source);
         }
+        chart.getTitle().setFont(new Font("Tahoma", Font.PLAIN, 13));
 		final XYPlot plot = chart.getXYPlot();
 		if(shapeRenderer) {					
 			plot.setRenderer(renderer);
