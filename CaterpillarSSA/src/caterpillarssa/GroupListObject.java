@@ -1,0 +1,34 @@
+package caterpillarssa;
+
+import java.util.List;
+
+/**
+ *
+ * @author Васькин Александр
+ */
+public class GroupListObject implements ListObject{
+    
+    private List groups;
+    
+    public GroupListObject(List groups) {
+        this.groups = groups;
+    }
+    
+    public String toString() {
+        String value = "";
+        for (int i = 0; i < groups.size(); i++) {
+            if(i != groups.size() - 1) {
+                value += groups.get(i).toString() + ",";
+            } else {
+                value += groups.get(i).toString();
+            }   
+        }
+        return value;
+    }
+
+    public List getGroups() {
+        return groups;
+    }
+    
+    
+}

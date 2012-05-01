@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import javax.swing.DefaultListModel;
 
 /**
  *
@@ -121,39 +122,121 @@ public class SpectrumAnalysis {
             }
         }
         data.setX(X);
-        /*for (int i = 0; i < X.length; i++) {
-            Matrix matrix = X[i];
-            //System.out.println("rank " + i + "= " + matrix.rank() + " " + matrix.getRowDimension() + " " + matrix.getColumnDimension());
+        /*
+         * for (int i = 0; i < X.length; i++) { Matrix matrix = X[i];
+         * //System.out.println("rank " + i + "= " + matrix.rank() + " " +
+         * matrix.getRowDimension() + " " + matrix.getColumnDimension());
+         *
+         * }
+         */
+        /*
+         * for (int k = 0; k < X.length; k++) {
+         * System.out.println("-----------------------------------"); for (int i
+         * = 0; i < X[k].getRowDimension(); i++) { for (int j = 0; j <
+         * X[k].getColumnDimension(); j++) { System.out.print(X[k].get(i, j) + "
+         * "); } System.out.println(); } }
+         */
 
-        }*/
-       /* for (int k = 0; k < X.length; k++) {
-            System.out.println("-----------------------------------");
-            for (int i = 0; i < X[k].getRowDimension(); i++) {
-                for (int j = 0; j < X[k].getColumnDimension(); j++) {
-                    System.out.print(X[k].get(i, j) + " ");
+        /*
+         * for (int i = 0; i < inclosureMatrix.length; i++) { for (int j = 0; j
+         * < inclosureMatrix[i].length; j++) {
+         * System.out.print(inclosureMatrix[i][j] + " "); }
+         * System.out.println(""); }
+         * System.out.println("---------------------"); for (int i = 0; i < 12;
+         * i++) { for (int j = 0; j < 181; j++) { double sum = 0; for (int k =
+         * 0; k < X.length; k++) { sum += X[k].get(i, j); } System.out.print(sum
+         * + " "); } System.out.println(); }
+         */
+
+    }
+
+    /**
+     * восстановление временного ряда (этап группировки)
+     *
+     * @param model модель JList (список групп)
+     * @param data данные для анализа
+     */
+    public static void grouping(DefaultListModel model, SSAData data) {
+        Matrix grouX[] = new Matrix[model.getSize()];
+        for (int i = 0; i < model.getSize(); i++) {
+            GroupListObject obj = (GroupListObject) model.get(i);
+            for (int j = 0; j < obj.getGroups().size(); j++) {
+                UnselectListObject unselect = (UnselectListObject) obj.getGroups().get(j);
+                System.out.println("index = " + unselect.getIndex());
+                if (j == 0) {
+                    grouX[i] = data.getX()[unselect.getIndex()];
+                } else {
+                    grouX[i] = grouX[i].plus(data.getX()[unselect.getIndex()]);
                 }
-                System.out.println();
             }
-        }*/
-        
-       /*for (int i = 0; i < inclosureMatrix.length; i++) {
-			for (int j = 0; j < inclosureMatrix[i].length; j++) {
-				System.out.print(inclosureMatrix[i][j] + " ");
-			}
-			System.out.println("");
-		}
-		System.out.println("---------------------");
-        for (int i = 0; i < 12; i++) {
-			for (int j = 0; j < 181; j++) {
-				double sum = 0;
-				for (int k = 0; k < X.length; k++) {
-					sum += X[k].get(i, j);
-				}
-				System.out.print(sum + " ");
-			}
-			System.out.println();
-		}*/
+            for (int j = 0; j < grouX[i].getRowDimension(); j++) {
+                for (int k = 0; k < grouX[i].getColumnDimension(); k++) {
+                    System.out.print(grouX[i].get(j, k) + " ");
+                }
+                System.out.println("-------------------");
+            }
+        }
+        data.setGroupX(grouX);
+    }
 
+    public static void diagonaAveraging(SSAData data) {
+        int L;
+        int K;
+        int N;
+        List<List> list = new ArrayList<List>();
+        for (int i = 0; i < data.getGroupX().length; i++) {
+            System.out.println(data.getGroupX()[0].getRowDimension() + " " + data.getGroupX()[0].getColumnDimension());
+            if (data.getGroupX()[i].getRowDimension() < data.getGroupX()[i].getColumnDimension()) {
+                L = data.getGroupX()[i].getRowDimension();
+                K = data.getGroupX()[i].getColumnDimension();
+            } else {
+                K = data.getGroupX()[i].getRowDimension();
+                L = data.getGroupX()[i].getColumnDimension();
+            }
+            N = data.getGroupX()[i].getRowDimension() + data.getGroupX()[i].getColumnDimension() - 1;
+            List series = new ArrayList();
+            double element;
+            for (int k = 0; k <= N - 1; k++) {
+                System.out.println("k = " + k);
+                element = 0;
+                if (k >= 0 && k < L - 1) {
+                    for (int m = 0; m < k + 1; m++) {
+                        element += data.getGroupX()[i].get(m, k - m);
+                    }
+                    double d = k + 1;
+                    element = element * (1 / d);                   
+                    series.add(element);
+                } else if (k >= L - 1 && k < K) {
+                    for (int m = 0; m < L; m++) {
+                        element += data.getGroupX()[i].get(m, k - m);
+                    }
+                    double d = L;
+                    element = element * (1 / d);
+                    series.add(element);
+                } else if (k >= K && k < N) {
+                    for (int m = k - K + 1; m < N - K + 1; m++) {
+                        element += data.getGroupX()[i].get(m, k - m);
+                    }
+                    double d = N - k;
+                    element = element * (1 / d);
+                    series.add(element);
+                }
+            }
+            System.out.println("size = " + series.size());
+            list.add(series);
+        }
+
+        double sum;
+        List<Double> reconstructionList = new ArrayList<Double>();
+        for (int j = 0; j < list.get(0).size(); j++) {
+            sum = 0;
+            for (int i = 0; i < list.size(); i++) {
+                sum += (Double)list.get(i).get(j);
+            }
+            reconstructionList.add(sum);
+        }
+         System.out.println("reconstruction = " + reconstructionList.size());
+        data.setReconstructionList(reconstructionList);
     }
 
     /**
@@ -233,5 +316,4 @@ public class SpectrumAnalysis {
         data.setLgEigenValue(lgList);
         data.setSqrtEigenValue(sqrtList);
     }
-
 }

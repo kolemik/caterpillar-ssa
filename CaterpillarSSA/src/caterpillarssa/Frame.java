@@ -24,7 +24,7 @@ import org.jfree.chart.plot.XYPlot;
  *
  * @author Васькин Александр
  */
-public class Frame extends javax.swing.JFrame {
+public class Frame extends javax.swing.JFrame implements Dialog{
 
 	private Dimension frameSize;
 	private JFileChooser chooserOpen;
@@ -61,6 +61,11 @@ public class Frame extends javax.swing.JFrame {
 				} else {
 					analysisItem.setEnabled(true);
 				}
+                if(data.getPercentList() == null) {
+                    reconstructionItem.setEnabled(false);
+                } else {
+                    reconstructionItem.setEnabled(true);
+                }
 			}
 
 			public void menuDeselected(MenuEvent e) {
@@ -134,6 +139,17 @@ public class Frame extends javax.swing.JFrame {
 				}
 			}
 		});
+        
+        reconstructionItem.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                GroupingDialog groupingDialog = new GroupingDialog(Frame.this, true, data, desctop);
+                groupingDialog.setVisible(true);
+            }
+        });
+        
+        exitItem.addActionListener(new ExitListener());
+
 	}
 
     public JButton getBackChart() {
@@ -147,7 +163,7 @@ public class Frame extends javax.swing.JFrame {
 	/**
 	 * метод, центрирующий приложение на экране
 	 */
-	private void centered() {
+	public void centered() {
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		frameSize = this.getSize();
 		if (frameSize.height > screenSize.height) {
@@ -210,6 +226,7 @@ public class Frame extends javax.swing.JFrame {
 					seriesTitle.add("Исходный");
 					ChartPanel chart = XYChart.createChart(listSeries, "Временной ряд", seriesTitle, fileName, false);
 					JInternalFrame timeSeriesFrame = InternalFrame.createInternalFrame(chart, "Временной ряд");
+                    timeSeriesFrame.setName("timeSeries");
 					final XYPlot plot = chart.getChart().getXYPlot();
 					NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
 					NumberAxis domainAxis = (NumberAxis) plot.getDomainAxis();
@@ -351,9 +368,10 @@ public class Frame extends javax.swing.JFrame {
         fileItem = new javax.swing.JMenu();
         openFileItem = new javax.swing.JMenuItem();
         jSeparator1 = new javax.swing.JPopupMenu.Separator();
-        jMenuItem2 = new javax.swing.JMenuItem();
+        exitItem = new javax.swing.JMenuItem();
         calcItem = new javax.swing.JMenu();
         analysisItem = new javax.swing.JMenuItem();
+        reconstructionItem = new javax.swing.JMenuItem();
         infoItem = new javax.swing.JMenu();
         jMenuItem3 = new javax.swing.JMenuItem();
         jMenuItem4 = new javax.swing.JMenuItem();
@@ -417,8 +435,8 @@ public class Frame extends javax.swing.JFrame {
         fileItem.add(openFileItem);
         fileItem.add(jSeparator1);
 
-        jMenuItem2.setText("Выход");
-        fileItem.add(jMenuItem2);
+        exitItem.setText("Выход");
+        fileItem.add(exitItem);
 
         jMenuBar1.add(fileItem);
 
@@ -431,6 +449,9 @@ public class Frame extends javax.swing.JFrame {
             }
         });
         calcItem.add(analysisItem);
+
+        reconstructionItem.setText("Группировка и восстановление");
+        calcItem.add(reconstructionItem);
 
         jMenuBar1.add(calcItem);
 
@@ -476,10 +497,10 @@ public class Frame extends javax.swing.JFrame {
     private javax.swing.JMenu calcItem;
     private javax.swing.JButton cascadeToolBar;
     private javax.swing.JDesktopPane desctop;
+    private javax.swing.JMenuItem exitItem;
     private javax.swing.JMenu fileItem;
     private javax.swing.JMenu infoItem;
     private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JPopupMenu.Separator jSeparator1;
@@ -487,6 +508,7 @@ public class Frame extends javax.swing.JFrame {
     private javax.swing.JButton nextToolBar;
     private javax.swing.JMenuItem openFileItem;
     private javax.swing.JButton openToolBar;
+    private javax.swing.JMenuItem reconstructionItem;
     private javax.swing.JButton tileToolBar;
     private javax.swing.JToolBar toolBar;
     // End of variables declaration//GEN-END:variables

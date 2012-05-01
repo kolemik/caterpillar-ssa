@@ -34,10 +34,9 @@ import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
  *
  * @author Васькин Александр
  */
-public class ParamsDialog extends javax.swing.JDialog {
+public class ParamsDialog extends javax.swing.JDialog implements Dialog{
 
     private Dimension frameSize;
-    private UIManager.LookAndFeelInfo l[];
     private SSAData data;
     private JDesktopPane desctop;
     private Frame parent;
@@ -59,7 +58,7 @@ public class ParamsDialog extends javax.swing.JDialog {
         cancelButton.addActionListener(new CancelListener());
     }
 
-    private void centered() {
+    public void centered() {
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         frameSize = this.getSize();
         if (frameSize.height > screenSize.height) {
@@ -78,7 +77,9 @@ public class ParamsDialog extends javax.swing.JDialog {
             //удаляем все internal frames
             JInternalFrame frames[] = desctop.getAllFrames();
             for (int i = 0; i < frames.length; i++) {
-                frames[i].dispose();
+                if(!frames[i].getName().equals("timeSeries")) {
+                    frames[i].dispose();
+                }             
             }
 
             ArrayList listSeries;
@@ -94,6 +95,7 @@ public class ParamsDialog extends javax.swing.JDialog {
             SpectrumAnalysis.functionEigenValue(data);
 
             JInternalFrame secondMomentFrame = new JInternalFrame("Вторые моменты", true, true, true, true);
+            secondMomentFrame.setName("secondMoment");
 
             listSeries = new ArrayList();
             seriesTitle = new ArrayList<String>();
@@ -110,6 +112,7 @@ public class ParamsDialog extends javax.swing.JDialog {
             NumberAxis rangeAxisCov = (NumberAxis) plotAvg.getRangeAxis();
             rangeAxisCov.setRange((Double) Collections.min(data.getCov()), (Double) Collections.max(data.getCov()));
             JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, chart, avgChart);
+            splitPane.setResizeWeight(0.5);
             secondMomentFrame.add(splitPane);
             desctop.add(secondMomentFrame);
             FrameParams.setInternalFrameParams(secondMomentFrame, desctop, data);
@@ -122,6 +125,7 @@ public class ParamsDialog extends javax.swing.JDialog {
             seriesTitle.add("Накопленные проценты");
             ChartPanel percentChart = XYChart.createChart(listSeries, "Собственные числа в процентах", seriesTitle, "", true);
             JInternalFrame percentFrame = InternalFrame.createInternalFrame(percentChart, "Собственные числа в процентах");
+            percentFrame.setName("percent");
             desctop.add(percentFrame);
             FrameParams.setInternalFrameParams(percentFrame, desctop, data);
 
@@ -133,6 +137,7 @@ public class ParamsDialog extends javax.swing.JDialog {
             seriesTitle.add("Логарифмы собственных чисел");
             ChartPanel funcChart = XYChart.createChart(listSeries, "Функции собственных чисел", seriesTitle, "", true);
             JInternalFrame funcFrame = InternalFrame.createInternalFrame(funcChart, "Функции собственных чисел");
+            funcFrame.setName("func");
             desctop.add(funcFrame);
             FrameParams.setInternalFrameParams(funcFrame, desctop, data);
 
@@ -204,8 +209,6 @@ public class ParamsDialog extends javax.swing.JDialog {
             mainComponentFrame.setVisible(true);
             desctop.add(mainComponentFrame);
             FrameParams.setInternalFrameParams(mainComponentFrame, desctop, data);
-            //setEigenChartList(listSeries, seriesTitle, mainCompListCharts, data.getEigenVectors());
-
             try {
                 mainComponentFrame.setMaximum(true);
                 eigenFuncFrame.setMaximum(true);
@@ -230,7 +233,7 @@ public class ParamsDialog extends javax.swing.JDialog {
     private void setEigenChartList(ArrayList listSeries, List<String> seriesTitle, List<ChartPanel> charts, List eigenVec) {
         for (int i = 0; i < eigenVec.size(); i++) {
             BigDecimal percent = new BigDecimal(data.getPercentList().get(i));
-            double num = percent.setScale(2, RoundingMode.HALF_EVEN).doubleValue();
+            double num = percent.setScale(3, RoundingMode.HALF_EVEN).doubleValue();
             listSeries = new ArrayList();
             seriesTitle = new ArrayList<String>();
             seriesTitle.add("" + (i + 1));
@@ -247,7 +250,7 @@ public class ParamsDialog extends javax.swing.JDialog {
     private void setMainCompChartList(ArrayList listSeries, List<String> seriesTitle, List<ChartPanel> charts) {
         for (int i = 0; i < data.getV().length; i++) {
             BigDecimal percent = new BigDecimal(data.getPercentList().get(i));
-            double num = percent.setScale(2, RoundingMode.HALF_EVEN).doubleValue();
+            double num = percent.setScale(3, RoundingMode.HALF_EVEN).doubleValue();
             listSeries = new ArrayList();
             seriesTitle = new ArrayList<String>();
             seriesTitle.add("" + (i + 1));
@@ -354,23 +357,25 @@ public class ParamsDialog extends javax.swing.JDialog {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(109, Short.MAX_VALUE)
-                .addComponent(okButton, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(cancelButton)
-                .addGap(103, 103, 103))
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(152, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(0, 111, Short.MAX_VALUE)
+                        .addComponent(okButton, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(cancelButton)
+                        .addGap(103, 103, 103))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(168, Short.MAX_VALUE))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 183, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 27, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(cancelButton)
                     .addComponent(okButton))

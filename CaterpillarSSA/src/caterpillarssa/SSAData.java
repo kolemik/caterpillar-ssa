@@ -15,7 +15,9 @@ public class SSAData {
     private int L;						//длина окна
     private double inclosureMatrix[][]; //матрица вложений
     private Matrix X[];			//элементарные матрицы сингулярного разложения
-    private Matrix V[];
+    private Matrix groupX[];    //результирующие матрица для каждой из групп
+    private Matrix V[];         //главные компоненты сингулярного разложения
+    private List<Double> reconstructionList; //восстановленный ряд
     private List<Double> SMA;			//скользящие средние
     private List<Double> cov;			//диагональное осреднение ковариаций
     private List<Double> eigenValueList;//собственные числа
@@ -86,6 +88,14 @@ public class SSAData {
 
     public void setX(Matrix X[]) {
         this.X = X;
+    }
+
+    public List<Double> getReconstructionList() {
+        return reconstructionList;
+    }
+
+    public void setReconstructionList(List<Double> reconstructionList) {
+        this.reconstructionList = reconstructionList;
     }
 
     public List<Double> getSMA() {
@@ -198,5 +208,13 @@ public class SSAData {
 
     public void setMainCompPage(int mainCompPage) {
         this.mainCompPage = mainCompPage;
+    }
+
+    public Matrix[] getGroupX() {
+        return groupX;
+    }
+
+    public void setGroupX(Matrix[] groupX) {
+        this.groupX = groupX;
     }
 }
