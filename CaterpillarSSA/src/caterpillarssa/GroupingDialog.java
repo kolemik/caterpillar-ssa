@@ -211,7 +211,7 @@ public class GroupingDialog extends javax.swing.JDialog implements Dialog {
         //восстановление временного ряда (группировка) 
         SpectrumAnalysis.grouping(groupsModel, data);
         //восстановление временного ряда (диагональное усреднение)
-        SpectrumAnalysis.diagonaAveraging(data);
+        SpectrumAnalysis.diagonalAveraging(data);
         GroupingDialog.this.setVisible(false);
         if(reconstructionFrame != null) {
             reconstructionFrame.dispose();

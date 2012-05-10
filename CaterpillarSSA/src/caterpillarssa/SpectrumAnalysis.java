@@ -44,7 +44,7 @@ public class SpectrumAnalysis {
         double inclosureMatrix[][] = data.getInclosureMatrix();
         double transp[][] = transpositionMatrix(inclosureMatrix);
         Matrix S = new Matrix(inclosureMatrix).times(new Matrix(transp));
-        int d = new Matrix(inclosureMatrix).rank(); //ранг матрицы вложений
+        //int d = new Matrix(inclosureMatrix).rank(); //ранг матрицы вложений
         EigenvalueDecomposition decomposition = new EigenvalueDecomposition(S);
         Matrix eigenvalue = decomposition.getD();   //матрица с собственными значениями
         Matrix eigenvec = decomposition.getV();     //матрица собственных векторов
@@ -83,12 +83,15 @@ public class SpectrumAnalysis {
         data.setAccruePercentList(accruePercentList);
         data.setPercentList(percentList);
 
-        Matrix V[] = new Matrix[d];
-        Matrix U[] = new Matrix[d];
-        Matrix X[] = new Matrix[d]; //элементарные матрицы сингулярного разложения
+        int size = eigenvec.getColumnDimension();
+        Matrix V[] = new Matrix[size];
+        Matrix U[] = new Matrix[size];
+        Matrix X[] = new Matrix[size]; //элементарные матрицы сингулярного разложения
         ArrayList listSeries = new ArrayList();
+        System.out.println(eigenvec.getColumnDimension() + " " + eigenvec.getColumnDimension());
         for (int j = 0; j < eigenvec.getColumnDimension(); j++) {
-            double uVec[][] = new double[d][1];
+            //System.out.println(size);
+            double uVec[][] = new double[size][1];
             ArrayList series = new ArrayList();
             for (int k = 0; k < eigenvec.getRowDimension(); k++) {
                 /*
@@ -122,37 +125,11 @@ public class SpectrumAnalysis {
             }
         }
         data.setX(X);
-        /*
-         * for (int i = 0; i < X.length; i++) { Matrix matrix = X[i];
-         * //System.out.println("rank " + i + "= " + matrix.rank() + " " +
-         * matrix.getRowDimension() + " " + matrix.getColumnDimension());
-         *
-         * }
-         */
-        /*
-         * for (int k = 0; k < X.length; k++) {
-         * System.out.println("-----------------------------------"); for (int i
-         * = 0; i < X[k].getRowDimension(); i++) { for (int j = 0; j <
-         * X[k].getColumnDimension(); j++) { System.out.print(X[k].get(i, j) + "
-         * "); } System.out.println(); } }
-         */
-
-        /*
-         * for (int i = 0; i < inclosureMatrix.length; i++) { for (int j = 0; j
-         * < inclosureMatrix[i].length; j++) {
-         * System.out.print(inclosureMatrix[i][j] + " "); }
-         * System.out.println(""); }
-         * System.out.println("---------------------"); for (int i = 0; i < 12;
-         * i++) { for (int j = 0; j < 181; j++) { double sum = 0; for (int k =
-         * 0; k < X.length; k++) { sum += X[k].get(i, j); } System.out.print(sum
-         * + " "); } System.out.println(); }
-         */
-
     }
 
     /**
      * восстановление временного ряда (этап группировки)
-     *
+     * 
      * @param model модель JList (список групп)
      * @param data данные для анализа
      */
@@ -162,24 +139,22 @@ public class SpectrumAnalysis {
             GroupListObject obj = (GroupListObject) model.get(i);
             for (int j = 0; j < obj.getGroups().size(); j++) {
                 UnselectListObject unselect = (UnselectListObject) obj.getGroups().get(j);
-                System.out.println("index = " + unselect.getIndex());
                 if (j == 0) {
                     grouX[i] = data.getX()[unselect.getIndex()];
                 } else {
                     grouX[i] = grouX[i].plus(data.getX()[unselect.getIndex()]);
                 }
             }
-            for (int j = 0; j < grouX[i].getRowDimension(); j++) {
-                for (int k = 0; k < grouX[i].getColumnDimension(); k++) {
-                    System.out.print(grouX[i].get(j, k) + " ");
-                }
-                System.out.println("-------------------");
-            }
         }
         data.setGroupX(grouX);
     }
-
-    public static void diagonaAveraging(SSAData data) {
+    
+    /**
+     * восстановление временного ряда (этап диагонального усреднения)
+     * 
+     * @param data данные для анализа
+     */
+    public static void diagonalAveraging(SSAData data) {
         int L;
         int K;
         int N;
@@ -197,7 +172,6 @@ public class SpectrumAnalysis {
             List series = new ArrayList();
             double element;
             for (int k = 0; k <= N - 1; k++) {
-                System.out.println("k = " + k);
                 element = 0;
                 if (k >= 0 && k < L - 1) {
                     for (int m = 0; m < k + 1; m++) {
@@ -222,7 +196,6 @@ public class SpectrumAnalysis {
                     series.add(element);
                 }
             }
-            System.out.println("size = " + series.size());
             list.add(series);
         }
 
@@ -235,7 +208,6 @@ public class SpectrumAnalysis {
             }
             reconstructionList.add(sum);
         }
-         System.out.println("reconstruction = " + reconstructionList.size());
         data.setReconstructionList(reconstructionList);
     }
 
