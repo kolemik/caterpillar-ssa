@@ -88,9 +88,7 @@ public class SpectrumAnalysis {
         Matrix U[] = new Matrix[size];
         Matrix X[] = new Matrix[size]; //элементарные матрицы сингулярного разложения
         ArrayList listSeries = new ArrayList();
-        System.out.println(eigenvec.getColumnDimension() + " " + eigenvec.getColumnDimension());
         for (int j = 0; j < eigenvec.getColumnDimension(); j++) {
-            //System.out.println(size);
             double uVec[][] = new double[size][1];
             ArrayList series = new ArrayList();
             for (int k = 0; k < eigenvec.getRowDimension(); k++) {
@@ -160,46 +158,56 @@ public class SpectrumAnalysis {
         int N;
         List<List> list = new ArrayList<List>();
         for (int i = 0; i < data.getGroupX().length; i++) {
-            System.out.println(data.getGroupX()[0].getRowDimension() + " " + data.getGroupX()[0].getColumnDimension());
-            if (data.getGroupX()[i].getRowDimension() < data.getGroupX()[i].getColumnDimension()) {
+           if (data.getGroupX()[i].getRowDimension() < data.getGroupX()[i].getColumnDimension()) {
                 L = data.getGroupX()[i].getRowDimension();
                 K = data.getGroupX()[i].getColumnDimension();
             } else {
                 K = data.getGroupX()[i].getRowDimension();
                 L = data.getGroupX()[i].getColumnDimension();
             }
-            N = data.getGroupX()[i].getRowDimension() + data.getGroupX()[i].getColumnDimension() - 1;
+		    N = data.getGroupX()[i].getRowDimension() + data.getGroupX()[i].getColumnDimension() - 1;
             List series = new ArrayList();
             double element;
             for (int k = 0; k <= N - 1; k++) {
                 element = 0;
                 if (k >= 0 && k < L - 1) {
-                    for (int m = 0; m < k + 1; m++) {
-                        element += data.getGroupX()[i].get(m, k - m);
+                    for (int m = 0; m <= k; m++) {
+						if(data.getGroupX()[i].getRowDimension() <= data.getGroupX()[i].getColumnDimension()) {
+							element += data.getGroupX()[i].get(m, k - m);
+						} else if(data.getGroupX()[i].getRowDimension() > data.getGroupX()[i].getColumnDimension()) {
+							element += data.getGroupX()[i].get(k - m, m);
+						}
                     }
-                    double d = k + 1;
-                    element = element * (1 / d);                   
+                    element = element * (1.0 / (k + 1));                   
                     series.add(element);
-                } else if (k >= L - 1 && k < K) {
-                    for (int m = 0; m < L; m++) {
-                        element += data.getGroupX()[i].get(m, k - m);
+                } 
+				if (k >= L - 1 && k < K - 1) {
+                    for (int m = 0; m <= L - 2; m++) {
+						if(data.getGroupX()[i].getRowDimension() <= data.getGroupX()[i].getColumnDimension()) {
+							element += data.getGroupX()[i].get(m, k - m);
+						} else if(data.getGroupX()[i].getRowDimension() > data.getGroupX()[i].getColumnDimension()) {
+							element += data.getGroupX()[i].get(k - m, m);
+						}
                     }
-                    double d = L;
-                    element = element * (1 / d);
+                    element = element * (1.0 / L);
                     series.add(element);
-                } else if (k >= K && k < N) {
-                    for (int m = k - K + 1; m < N - K + 1; m++) {
-                        element += data.getGroupX()[i].get(m, k - m);
+                }
+				if (k >= K - 1 && k < N) {
+                    for (int m = k - K + 1; m <= N - K; m++) {
+						if(data.getGroupX()[i].getRowDimension() <= data.getGroupX()[i].getColumnDimension()) {
+							element += data.getGroupX()[i].get(m, k - m);
+						} else if(data.getGroupX()[i].getRowDimension() > data.getGroupX()[i].getColumnDimension()) {
+							element += data.getGroupX()[i].get(k - m, m);
+						}
                     }
-                    double d = N - k;
-                    element = element * (1 / d);
+                    element = element * (1.0 / (N - k));
                     series.add(element);
                 }
             }
             list.add(series);
         }
-
         double sum;
+		//суммируем полученные ряды и получаем исходный ряд
         List<Double> reconstructionList = new ArrayList<Double>();
         for (int j = 0; j < list.get(0).size(); j++) {
             sum = 0;

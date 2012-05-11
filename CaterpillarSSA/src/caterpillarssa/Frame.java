@@ -18,7 +18,6 @@ import javax.swing.event.MenuListener;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.XYPlot;
-//import org.jfree.d
 
 /**
  *
@@ -48,8 +47,6 @@ public class Frame extends javax.swing.JFrame implements Dialog{
 		}
 
 		data = new SSAData();
-		//desctop = new JDesktopPane();
-		//setContentPane(desctop);
 
 		openFileItem.addActionListener((new OpenFile(data)));
 		analysisItem.addActionListener(new Analysis(data, this, desctop));
@@ -382,6 +379,7 @@ public class Frame extends javax.swing.JFrame implements Dialog{
         toolBar.setRollover(true);
 
         openToolBar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image/folder.png"))); // NOI18N
+        openToolBar.setToolTipText("Открыть");
         openToolBar.setFocusable(false);
         openToolBar.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         openToolBar.setMargin(new java.awt.Insets(3, 3, 3, 3));
@@ -389,6 +387,7 @@ public class Frame extends javax.swing.JFrame implements Dialog{
         toolBar.add(openToolBar);
 
         nextToolBar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image/next.png"))); // NOI18N
+        nextToolBar.setToolTipText("Следующее окно");
         nextToolBar.setFocusable(false);
         nextToolBar.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         nextToolBar.setMargin(new java.awt.Insets(3, 3, 3, 3));
@@ -396,6 +395,7 @@ public class Frame extends javax.swing.JFrame implements Dialog{
         toolBar.add(nextToolBar);
 
         cascadeToolBar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image/cascade.png"))); // NOI18N
+        cascadeToolBar.setToolTipText("Каскад");
         cascadeToolBar.setFocusable(false);
         cascadeToolBar.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         cascadeToolBar.setMargin(new java.awt.Insets(3, 3, 3, 3));
@@ -403,6 +403,7 @@ public class Frame extends javax.swing.JFrame implements Dialog{
         toolBar.add(cascadeToolBar);
 
         tileToolBar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image/tile.png"))); // NOI18N
+        tileToolBar.setToolTipText("Мозаика");
         tileToolBar.setFocusable(false);
         tileToolBar.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         tileToolBar.setMargin(new java.awt.Insets(3, 3, 3, 3));
@@ -410,6 +411,7 @@ public class Frame extends javax.swing.JFrame implements Dialog{
         toolBar.add(tileToolBar);
 
         backChart.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image/2left.png"))); // NOI18N
+        backChart.setToolTipText("Предыдущая группа");
         backChart.setEnabled(false);
         backChart.setFocusable(false);
         backChart.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -417,6 +419,7 @@ public class Frame extends javax.swing.JFrame implements Dialog{
         toolBar.add(backChart);
 
         nextChart.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image/2right.png"))); // NOI18N
+        nextChart.setToolTipText("Следующая группа");
         nextChart.setEnabled(false);
         nextChart.setFocusable(false);
         nextChart.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
