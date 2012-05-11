@@ -29,6 +29,7 @@ public class Frame extends javax.swing.JFrame implements Dialog{
 	private JFileChooser chooserOpen;
 	private UIManager.LookAndFeelInfo l[];
 	private SSAData data;
+	private AboutDialog aboutDialog;
 
 	/** Creates new form Frame */
 	public Frame() {
@@ -45,7 +46,8 @@ public class Frame extends javax.swing.JFrame implements Dialog{
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
+		
+		aboutDialog = new AboutDialog(this, "О программе");
 		data = new SSAData();
 
 		openFileItem.addActionListener((new OpenFile(data)));
@@ -146,6 +148,11 @@ public class Frame extends javax.swing.JFrame implements Dialog{
         });
         
         exitItem.addActionListener(new ExitListener());
+		aboutItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                aboutDialog.setVisible(true);
+            }
+        });
 
 	}
 
@@ -370,8 +377,8 @@ public class Frame extends javax.swing.JFrame implements Dialog{
         analysisItem = new javax.swing.JMenuItem();
         reconstructionItem = new javax.swing.JMenuItem();
         infoItem = new javax.swing.JMenu();
-        jMenuItem3 = new javax.swing.JMenuItem();
-        jMenuItem4 = new javax.swing.JMenuItem();
+        helpItem = new javax.swing.JMenuItem();
+        aboutItem = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Гусеница-SSA");
@@ -458,13 +465,15 @@ public class Frame extends javax.swing.JFrame implements Dialog{
 
         jMenuBar1.add(calcItem);
 
-        jMenuItem3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image/help_16.png"))); // NOI18N
-        jMenuItem3.setText("Помощь");
-        infoItem.add(jMenuItem3);
+        infoItem.setText("Справка");
 
-        jMenuItem4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image/info_16.png"))); // NOI18N
-        jMenuItem4.setText("О программе");
-        infoItem.add(jMenuItem4);
+        helpItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image/help_16.png"))); // NOI18N
+        helpItem.setText("Помощь");
+        infoItem.add(helpItem);
+
+        aboutItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image/info_16.png"))); // NOI18N
+        aboutItem.setText("О программе");
+        infoItem.add(aboutItem);
 
         jMenuBar1.add(infoItem);
 
@@ -495,6 +504,7 @@ public class Frame extends javax.swing.JFrame implements Dialog{
 		// TODO add your handling code here:
     }//GEN-LAST:event_analysisItemActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenuItem aboutItem;
     private javax.swing.JMenuItem analysisItem;
     private javax.swing.JButton backChart;
     private javax.swing.JMenu calcItem;
@@ -502,10 +512,9 @@ public class Frame extends javax.swing.JFrame implements Dialog{
     private javax.swing.JDesktopPane desctop;
     private javax.swing.JMenuItem exitItem;
     private javax.swing.JMenu fileItem;
+    private javax.swing.JMenuItem helpItem;
     private javax.swing.JMenu infoItem;
     private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JMenuItem jMenuItem3;
-    private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JButton nextChart;
     private javax.swing.JButton nextToolBar;
