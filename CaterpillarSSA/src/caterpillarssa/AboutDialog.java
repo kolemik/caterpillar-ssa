@@ -24,6 +24,7 @@ public class AboutDialog extends JDialog implements Dialog {
 
 	public AboutDialog(JFrame owner, String title) {
 		super(owner, title, true);
+        setResizable(false);
 		this.setSize(590, 350);
 		centered();
 		l = UIManager.getInstalledLookAndFeels();
@@ -45,7 +46,7 @@ public class AboutDialog extends JDialog implements Dialog {
 				AboutDialog.this.setVisible(false);
 			}
 		});
-		p.add(b);
+		p.add(b, BorderLayout.CENTER);
 		this.add(BorderLayout.SOUTH, p);
 
 

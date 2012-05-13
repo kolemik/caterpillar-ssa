@@ -33,7 +33,7 @@ public class ImageComponent extends JComponent {
         int imageWidth = image.getWidth(this);
         int imageHeight = image.getHeight(this);
         //отображение логотипа в левом вехнем углу
-        g.drawImage(image, 0, 0, null);
+        g.drawImage(image, 10, 50, null);
 
         g.setFont(new Font("Helvetica", Font.PLAIN, 14));
 
