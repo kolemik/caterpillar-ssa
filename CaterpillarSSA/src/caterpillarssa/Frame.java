@@ -91,6 +91,12 @@ public class Frame extends javax.swing.JFrame implements Dialog{
 				cascadeWindows();
 			}
 		});
+        maximize.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                setMaximizeWindows();
+            }
+        });
 		openToolBar.addActionListener(new OpenFile(data));
 		backChart.addActionListener(new ActionListener() {
 
@@ -348,9 +354,18 @@ public class Frame extends javax.swing.JFrame implements Dialog{
 			}
 		}
 	}
+    
+    public void setMaximizeWindows() {
+        JInternalFrame[] frames = desctop.getAllFrames();
+		for (int i = 0; i < frames.length; i++) {
+            try {
+                frames[i].setMaximum(true);
+            } catch (PropertyVetoException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
 
-	//private
-	//public void
 	/** This method is called from within the constructor to
 	 * initialize the form.
 	 * WARNING: Do NOT modify this code. The content of this method is
@@ -365,6 +380,7 @@ public class Frame extends javax.swing.JFrame implements Dialog{
         nextToolBar = new javax.swing.JButton();
         cascadeToolBar = new javax.swing.JButton();
         tileToolBar = new javax.swing.JButton();
+        maximize = new javax.swing.JButton();
         backChart = new javax.swing.JButton();
         nextChart = new javax.swing.JButton();
         desctop = new javax.swing.JDesktopPane();
@@ -416,6 +432,13 @@ public class Frame extends javax.swing.JFrame implements Dialog{
         tileToolBar.setMargin(new java.awt.Insets(3, 3, 3, 3));
         tileToolBar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         toolBar.add(tileToolBar);
+
+        maximize.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image/mazimaze.png"))); // NOI18N
+        maximize.setToolTipText("Максимизировать окна");
+        maximize.setFocusable(false);
+        maximize.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        maximize.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        toolBar.add(maximize);
 
         backChart.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image/2left.png"))); // NOI18N
         backChart.setToolTipText("Предыдущая группа");
@@ -516,6 +539,7 @@ public class Frame extends javax.swing.JFrame implements Dialog{
     private javax.swing.JMenu infoItem;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JPopupMenu.Separator jSeparator1;
+    private javax.swing.JButton maximize;
     private javax.swing.JButton nextChart;
     private javax.swing.JButton nextToolBar;
     private javax.swing.JMenuItem openFileItem;
