@@ -127,7 +127,7 @@ public class SpectrumAnalysis {
 
     /**
      * восстановление временного ряда (этап группировки)
-     * 
+     *
      * @param model модель JList (список групп)
      * @param data данные для анализа
      */
@@ -146,10 +146,10 @@ public class SpectrumAnalysis {
         }
         data.setGroupX(grouX);
     }
-    
+
     /**
      * восстановление временного ряда (этап диагонального усреднения)
-     * 
+     *
      * @param data данные для анализа
      */
     public static void diagonalAveraging(SSAData data) {
@@ -158,47 +158,47 @@ public class SpectrumAnalysis {
         int N;
         List<List> list = new ArrayList<List>();
         for (int i = 0; i < data.getGroupX().length; i++) {
-           if (data.getGroupX()[i].getRowDimension() < data.getGroupX()[i].getColumnDimension()) {
+            if (data.getGroupX()[i].getRowDimension() < data.getGroupX()[i].getColumnDimension()) {
                 L = data.getGroupX()[i].getRowDimension();
                 K = data.getGroupX()[i].getColumnDimension();
             } else {
                 K = data.getGroupX()[i].getRowDimension();
                 L = data.getGroupX()[i].getColumnDimension();
             }
-		    N = data.getGroupX()[i].getRowDimension() + data.getGroupX()[i].getColumnDimension() - 1;
+            N = data.getGroupX()[i].getRowDimension() + data.getGroupX()[i].getColumnDimension() - 1;
             List series = new ArrayList();
             double element;
             for (int k = 0; k <= N - 1; k++) {
                 element = 0;
                 if (k >= 0 && k < L - 1) {
                     for (int m = 0; m <= k; m++) {
-						if(data.getGroupX()[i].getRowDimension() <= data.getGroupX()[i].getColumnDimension()) {
-							element += data.getGroupX()[i].get(m, k - m);
-						} else if(data.getGroupX()[i].getRowDimension() > data.getGroupX()[i].getColumnDimension()) {
-							element += data.getGroupX()[i].get(k - m, m);
-						}
+                        if (data.getGroupX()[i].getRowDimension() <= data.getGroupX()[i].getColumnDimension()) {
+                            element += data.getGroupX()[i].get(m, k - m);
+                        } else if (data.getGroupX()[i].getRowDimension() > data.getGroupX()[i].getColumnDimension()) {
+                            element += data.getGroupX()[i].get(k - m, m);
+                        }
                     }
-                    element = element * (1.0 / (k + 1));                   
+                    element = element * (1.0 / (k + 1));
                     series.add(element);
-                } 
-				if (k >= L - 1 && k < K - 1) {
+                }
+                if (k >= L - 1 && k < K - 1) {
                     for (int m = 0; m <= L - 2; m++) {
-						if(data.getGroupX()[i].getRowDimension() <= data.getGroupX()[i].getColumnDimension()) {
-							element += data.getGroupX()[i].get(m, k - m);
-						} else if(data.getGroupX()[i].getRowDimension() > data.getGroupX()[i].getColumnDimension()) {
-							element += data.getGroupX()[i].get(k - m, m);
-						}
+                        if (data.getGroupX()[i].getRowDimension() <= data.getGroupX()[i].getColumnDimension()) {
+                            element += data.getGroupX()[i].get(m, k - m);
+                        } else if (data.getGroupX()[i].getRowDimension() > data.getGroupX()[i].getColumnDimension()) {
+                            element += data.getGroupX()[i].get(k - m, m);
+                        }
                     }
                     element = element * (1.0 / L);
                     series.add(element);
                 }
-				if (k >= K - 1 && k < N) {
+                if (k >= K - 1 && k < N) {
                     for (int m = k - K + 1; m <= N - K; m++) {
-						if(data.getGroupX()[i].getRowDimension() <= data.getGroupX()[i].getColumnDimension()) {
-							element += data.getGroupX()[i].get(m, k - m);
-						} else if(data.getGroupX()[i].getRowDimension() > data.getGroupX()[i].getColumnDimension()) {
-							element += data.getGroupX()[i].get(k - m, m);
-						}
+                        if (data.getGroupX()[i].getRowDimension() <= data.getGroupX()[i].getColumnDimension()) {
+                            element += data.getGroupX()[i].get(m, k - m);
+                        } else if (data.getGroupX()[i].getRowDimension() > data.getGroupX()[i].getColumnDimension()) {
+                            element += data.getGroupX()[i].get(k - m, m);
+                        }
                     }
                     element = element * (1.0 / (N - k));
                     series.add(element);
@@ -207,12 +207,12 @@ public class SpectrumAnalysis {
             list.add(series);
         }
         double sum;
-		//суммируем полученные ряды и получаем исходный ряд
+        //суммируем полученные ряды и получаем исходный ряд
         List<Double> reconstructionList = new ArrayList<Double>();
         for (int j = 0; j < list.get(0).size(); j++) {
             sum = 0;
             for (int i = 0; i < list.size(); i++) {
-                sum += (Double)list.get(i).get(j);
+                sum += (Double) list.get(i).get(j);
             }
             reconstructionList.add(sum);
         }
@@ -254,38 +254,55 @@ public class SpectrumAnalysis {
             data.setSMA(SMA);
         }
     }
-
+    
+    /**
+     * диагональное осреднение ковариационной матрицы 
+     * (относительно побочной диагонали)
+     * 
+     * @param data данные для анализа
+     */
     public static void averagedCovariance(SSAData data) {
-        int N = 0;
-        double avg = 0;
+        double avg;
+        double K = data.getTimeSeries().size() - data.getL() + 1; //количество векторов вложения
         List<Double> covarianceList = new ArrayList<Double>();
         double transp[][] = transpositionMatrix(data.getInclosureMatrix());
         Matrix S = new Matrix(data.getInclosureMatrix()).times(new Matrix(transp));
+        S = S.times(1.0 / K); //ковариационная матрица
         int size = S.getColumnDimension();
-        N = size + size - 1;
+        int N = size + size - 1;
+        int n;
         for (int k = 0; k < N; k++) {
             if ((k % 2) == 0) {
                 if (k >= 0 && k < size) {
                     avg = 0;
+                    n = 0;
                     for (int m = 0; m <= k; m++) {
-                        avg += S.get(m, k - m);
+                        avg += S.get(m, size - 1 - (k - m));
+                        n++;
                     }
-                    avg = avg / (k + 1);
+                    avg = avg / (n);
                     covarianceList.add(avg);
                 }
                 if (k >= size && k < N) {
+                    avg = 0;
+                    n = 0;
                     for (int m = k - size + 1; m <= N - size; m++) {
-                        avg += S.get(m, k - m);
+                        avg += S.get(m, size - 1 - (k - m));
+                        n++;
                     }
-                    avg = avg / (k + 1);
+                    avg = avg / (n);
                     covarianceList.add(avg);
                 }
-
             }
         }
         data.setCov(covarianceList);
     }
 
+    /**
+     * формирование функций собственных чисел
+     * 
+     * @param data данные для анализа 
+     */
     public static void functionEigenValue(SSAData data) {
         List<Double> lgList = new ArrayList<Double>();
         List<Double> sqrtList = new ArrayList<Double>();
@@ -296,4 +313,5 @@ public class SpectrumAnalysis {
         data.setLgEigenValue(lgList);
         data.setSqrtEigenValue(sqrtList);
     }
+    
 }
