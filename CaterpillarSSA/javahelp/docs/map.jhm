@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE map PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp Map Version 2.0//EN" "http://java.sun.com/products/javahelp/map_2_0.dtd">
+<map version="2.0">
+    <mapID target="about" url="content/about.html"/>
+    <mapID target="alg" url="content/alg.html"/>
+    <mapID target="inclosure" url="content/inclosure.html"/>
+    <mapID target="svd" url="content/svd.html"/>
+    <mapID target="grouping" url="content/grouping.html"/>
+    <mapID target="diagonal_avg" url="content/diagonal_avg.html"/>
+    <mapID target="backIcon" url="icons/back.png"/>
+    <mapID target="printerIcon" url="icons/printer.png"/>
+    <mapID target="forwardIcon" url="icons/forward.png"/>
+    <mapID target="homeIcon" url="icons/home.png"/>
+    <mapID target="favoritesAddIcon" url="icons/favoritesadd.png"/>
+    <mapID target="favoritesIcon" url="icons/favorites.png"/>
+    <mapID target="fileIcon" url="icons/file.png"/>
+    <mapID target="reloadIcon" url="icons/refresh.png"/>
+    <mapID target="helpIcon" url="icons/help.png"/>
+    <mapID target="searchIcon" url="icons/search.png"/>
+    <mapID target="indexIcon" url="icons/index.png"/>
+    <mapID target="mainIcon" url="icons/main.png"/>
+</map>

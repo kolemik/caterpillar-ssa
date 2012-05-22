@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE toc PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp TOC Version 2.0//EN" "http://java.sun.com/products/javahelp/toc_2_0.dtd">
+<toc version="2.0">
+    <tocitem text="Инструкция" target="about">
+        <tocitem text="Описание программы" target="about">
+        </tocitem>
+        <tocitem text="Описание алгоритма" target="alg">
+            <tocitem text="Вложение" target="inclosure"/>
+            <tocitem text="Сингулярное разложение" target="svd"/>
+            <tocitem text="Группировка" target="grouping"/>
+            <tocitem text="Диагональное усреднение" target="diagonal_avg"/>
+        </tocitem>
+   </tocitem>
+</toc>
