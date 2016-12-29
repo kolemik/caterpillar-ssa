@@ -156,28 +156,28 @@ public class SSA
         return result;
     }
 
-    /*return regenerated vector from matrix*/
-    private double[] regeneratedValue(Matrix matrix)
-    {
-        double[] result = new double[matrix.getRowDimension()];
-        int m;
-        if(matrix.getColumnDimension()<5)
-        {
-            m=matrix.getColumnDimension();
-        }
-        else
-        {
-            m = 5;
-        }
-        for (int i = 0; i < matrix.getRowDimension(); i++)
-        {
-            for (int j = 0; j < m; j++)
-            {
-                result[i] = result[i] + matrix.get(i, j);
-            }
-        }
-        return result;
-    }
+//    /*return regenerated vector from matrix*/
+//    private double[] regeneratedValue(Matrix matrix)
+//    {
+//        double[] result = new double[matrix.getRowDimension()];
+//        int m;
+//        if(matrix.getColumnDimension()<5)
+//        {
+//            m=matrix.getColumnDimension();
+//        }
+//        else
+//        {
+//            m = 5;
+//        }
+//        for (int i = 0; i < matrix.getRowDimension(); i++)
+//        {
+//            for (int j = 0; j < m; j++)
+//            {
+//                result[i] = result[i] + matrix.get(i, j);
+//            }
+//        }
+//        return result;
+//    }
     /**
      * @param T - number of input data
      * @param L - number of reconstructed components input data series to be decomposed to
@@ -205,7 +205,7 @@ public class SSA
             UM.set(0, i, U.get(L - 1, i));
         }
         double v = UM.norm2();
-        A.timesEquals(1 / (1 - Math.pow(v, 2)));
+        A.timesEquals(1.0d / (1.0d - Math.pow(v, 2.0d)));
         A = matrixColumnRevert(A);
         Matrix G = new Matrix(Q.getRowDimension(), 1);
         for (int i = 0; i < G.getRowDimension(); i++)
@@ -231,7 +231,8 @@ public class SSA
             }
             F.set(i, 0, res);
         }
-        double[] res = new double[G.getRowDimension() + M];new Matrix(G.getRowDimension() + M, 1);
+        double[] res = new double[G.getRowDimension() + M];
+//        new Matrix(G.getRowDimension() + M, 1);
         for (int i = 0; i < G.getRowDimension(); i++)
         {
             res[i] = G.get(i,0);
@@ -245,10 +246,12 @@ public class SSA
 
     /**
      * @param inputData - vector of input data
-     * @param m - count of forecasting elements
+     * @param l - window size
+     * @param e - number of top eigen values (e < l)
+     * @param m - count of forecasting elements (m < inputData.length / 2)
      * @return - return vector which contain elements of input data and forecasting elements
      * */
-    public double[] forecasting(double[] inputData, int m)
+    public double[] forecasting(double[] inputData, int l, int e, int m)
     {
         int n = inputData.length;
         if (n<=2)
@@ -256,15 +259,15 @@ public class SSA
             log.info("For SSA Method length of an input vector must be more than 2. Size of input vector = " + n);
             return null;
         }
-        int l;
-        if(n>=6)
-        {
-            l = n / 2 - 1;
-        }
-        else
-        {
-            l = n-1;
-        }
+//        int l;
+//        if(n>=6)
+//        {
+//            l = n / 2 - 1;
+//        }
+//        else
+//        {
+//            l = n-1;
+//        }
         int k = n - l + 1;
         Matrix trajectoryMatrix = getTrajectoryMatrix(inputData, l);
         Matrix C = trajectoryMatrix.times(trajectoryMatrix.transpose());
@@ -272,7 +275,7 @@ public class SSA
         Matrix eigenVector = singularValueDecomposition.getV();
         Matrix V = getV(trajectoryMatrix.transpose(), eigenVector);
         Matrix Q = getQ(eigenVector, V, k, l);
-        double [] forecast = calculateForecasting(n, l, l / 2, m, eigenVector, Q);
+        double [] forecast = calculateForecasting(n, l, e, m, eigenVector, Q);
         return forecast;
     }
 
