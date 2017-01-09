@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="javahelp"/>
+	<classpathentry kind="lib" path="jcommon-1.0.17.jar"/>
+	<classpathentry kind="lib" path="jfreechart-1.0.14.jar"/>
+	<classpathentry kind="lib" path="jh.jar"/>
+	<classpathentry kind="lib" path="swing_ru.jar"/>
+	<classpathentry kind="lib" path="lib/jama-1.0.3.jar" sourcepath="lib/jama-1.0.3-sources.jar"/>
+	<classpathentry kind="lib" path="lib/slf4j-api-1.7.8.jar"/>
+	<classpathentry kind="lib" path="lib/slf4j-log4j12-1.7.8.jar"/>
+	<classpathentry kind="lib" path="lib/log4j-1.2.16.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
