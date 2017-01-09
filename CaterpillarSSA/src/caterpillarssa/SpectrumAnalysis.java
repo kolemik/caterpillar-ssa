@@ -5,6 +5,7 @@ import Jama.Matrix;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import javax.swing.DefaultListModel;
 
@@ -49,6 +50,13 @@ public class SpectrumAnalysis {
         Matrix eigenvalue = decomposition.getD();   //матрица с собственными значениями
         Matrix eigenvec = decomposition.getV();     //матрица собственных векторов
         List<Double> eigenvalueList = new ArrayList<Double>();
+        
+        double[] real = decomposition.getRealEigenvalues();
+        double[] imag = decomposition.getImagEigenvalues();
+        for (int i = 0; i < Math.min(real.length, imag.length); i++) {
+        	System.out.println("EV = " + real[i] + " + i * " + imag[i]);
+        }
+        
         //формируем набор собственных значений, стоящих на диагонали
         for (int i = 0; i < eigenvalue.getRowDimension(); i++) {
             for (int j = 0; j < eigenvalue.getRowDimension(); j++) {
@@ -64,6 +72,13 @@ public class SpectrumAnalysis {
          * порядке)
          */
         Collections.sort(eigenvalueList, comparator);
+        for (int i = 0; i < eigenvalueList.size(); i++) {
+        	Double d = eigenvalueList.get(i);
+        	if (Math.abs(d) < Math.pow(10, -10)) {
+        		eigenvalueList.set(i, 0.0);
+        	}
+        }
+        System.out.println("EV LIST: " + eigenvalueList);
         data.setEigenValueList(eigenvalueList);
         double sumValueList = 0;
         List<Double> percentList;
