@@ -205,8 +205,10 @@ public class SSA
             UM.set(0, i, U.get(L - 1, i));
         }
         double v = UM.norm2();
+        System.out.println("Nu2 = " + v*v + "\talpha = " + (180 * Math.acos(v) / Math.PI));
         A.timesEquals(1.0d / (1.0d - Math.pow(v, 2.0d)));
         A = matrixColumnRevert(A);
+        A.print(9, 7);
         Matrix G = new Matrix(Q.getRowDimension(), 1);
         for (int i = 0; i < G.getRowDimension(); i++)
         {
@@ -278,5 +280,4 @@ public class SSA
         double [] forecast = calculateForecasting(n, l, e, m, eigenVector, Q);
         return forecast;
     }
-
 }

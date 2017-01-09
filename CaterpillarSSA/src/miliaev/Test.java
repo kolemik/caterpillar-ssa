@@ -23,7 +23,7 @@ public class Test {
 //		decomp.getV().print(5, 3);
 		
 		List<Double> sourceList = new ArrayList<>();
-		try (Scanner scan = new Scanner(new FileInputStream("linear.dat"))) {
+		try (Scanner scan = new Scanner(new FileInputStream("ceil.dat"))) {
 			while (scan.hasNextLine()) {
 				sourceList.add(Double.parseDouble(scan.nextLine()));
 			}
@@ -34,11 +34,13 @@ public class Test {
 			source[i] = sourceList.get(i);
 		}
 
-		print(source, doMiliaev(Arrays.copyOf(source, (int) (source.length * 0.8))));
+		new SSAdebug().testTraj(source, 50, 60);
+		
+//		print(source, doMiliaev(Arrays.copyOf(source, (int) (source.length * 0.8))));
 //		print(source, doVaskin(source));
 	}
 
-	private static void print(double[] source, double[] result) {
+	public static void print(double[] source, double[] result) {
 		System.out.println(source.length + " / " + result.length);
 		for (int i = 0; i < result.length; i++) {
 			double delta = 0.0;

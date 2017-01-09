@@ -287,7 +287,7 @@ public class SSAdebug
         l = 50; // TODO - autodetect window size
         int k = n - l + 1;
         Matrix trajectoryMatrix = getTrajectoryMatrix(inputData, l);
-        System.out.println("traject: " + trajectoryMatrix.getRowDimension() + " / " + trajectoryMatrix.getColumnDimension());
+//        System.out.println("traject: " + trajectoryMatrix.getRowDimension() + " / " + trajectoryMatrix.getColumnDimension());
         Matrix C = trajectoryMatrix.times(trajectoryMatrix.transpose());
         System.out.println("C: " + C.getRowDimension() + " / " + C.getColumnDimension());
         SingularValueDecomposition singularValueDecomposition = new SingularValueDecomposition(C);
@@ -298,6 +298,28 @@ public class SSAdebug
         int evSize = 30;// / 2;// TODO - here should be selected eigen values
         double [] forecast = calculateForecasting(n, l, evSize, m, eigenVector, Q);
         return forecast;
+    }
+
+
+    /**
+     * 
+     * @param inputData
+     * @param l - window size
+     * @param k - matrix len
+     */
+    public void testTraj(double[] inputData, int l, int k) {
+    	int len = inputData.length;
+    	for (int i = 0; i < len - k; i++) {
+    		Matrix m = getTrajectoryMatrix(Arrays.copyOfRange(inputData, i, i + k), l);
+            Matrix C = m.times(m.transpose());
+//    		C.print(5, 3);
+            SingularValueDecomposition singularValueDecomposition = new SingularValueDecomposition(C);
+            double[] eigen = singularValueDecomposition.getSingularValues();
+            for (double d : eigen) {
+            	System.out.printf("%8.3f\t", Math.sqrt(d));
+            }
+            System.out.println();
+    	}
     }
 
 }

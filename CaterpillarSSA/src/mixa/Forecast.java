@@ -20,9 +20,11 @@ public class Forecast {
 	public static void main(String[] args) {
 		List<Double> data = new ArrayList<Double>();
 		
-//		String fname = "data/sin.dat";
-//		String fname = "data/fort.dat";
-		String fname = "data/fort120.dat";
+//		String fname = "data/sin.dat"; int M = 24; int componentsCount = 5;
+
+		String fname = "data/fort.dat"; int M = 84; int componentsCount = 33;
+//		String fname = "data/fort120.dat"; int M = 60; int componentsCount = 33;
+
 		File file = new File(fname);
 		
 		try (Scanner scan = new Scanner(file)) {
@@ -35,7 +37,6 @@ public class Forecast {
 		
 		System.out.println("{" + data.size() + "} " + data);
 		
-		int M = 48;
 		int N = data.size();
 		
 		Matrix X = new Matrix(N - M + 1, M);
@@ -60,13 +61,14 @@ public class Forecast {
 		Matrix Y = X.times(P);
 		
 		Matrix filter = new Matrix(M,M);
-		int componentsCount = 33;
 		for (int i = M - componentsCount; i < M; i++) {
 			filter.set(i, i, 1);
 		}
 		Matrix Y_filtered = Y.times(filter);
+		Matrix P_filtered = P.times(filter);
 		
-		Matrix X_resulted = Y_filtered.times(P.transpose());
+		
+		Matrix X_resulted = Y_filtered.times(P_filtered.transpose());
 		
 		double [] result = new double[N];
 		double [] diff = new double[N];

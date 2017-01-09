@@ -8,6 +8,9 @@
 	<classpathentry kind="lib" path="lib/jh.jar"/>
 	<classpathentry kind="lib" path="lib/la4j-0.2.0.jar"/>
 	<classpathentry kind="lib" path="lib/swing_ru.jar"/>
+	<classpathentry kind="lib" path="lib/log4j-1.2.16.jar"/>
+	<classpathentry kind="lib" path="lib/slf4j-api-1.7.8.jar"/>
+	<classpathentry kind="lib" path="lib/slf4j-log4j12-1.7.8.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
