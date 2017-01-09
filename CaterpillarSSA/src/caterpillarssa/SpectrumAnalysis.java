@@ -65,6 +65,11 @@ public class SpectrumAnalysis {
                 }
             }
         }
+
+        System.out.print("Diagonal:");
+        decomposition.getD().print(5, 3);
+        System.out.println();
+
         Comparator comparator = Collections.reverseOrder();
         /*
          * собственные значения должны быть в убывающем порядке, поэтому

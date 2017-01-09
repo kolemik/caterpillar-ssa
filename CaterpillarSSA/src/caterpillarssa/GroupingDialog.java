@@ -1,19 +1,19 @@
 package caterpillarssa;
 
-import Jama.Matrix;
-import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyVetoException;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.*;
+
+import javax.swing.DefaultListModel;
+import javax.swing.JDesktopPane;
+import javax.swing.JInternalFrame;
+
 import org.jfree.chart.ChartPanel;
+import org.jfree.chart.plot.SeriesRenderingOrder;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 
@@ -23,20 +23,20 @@ import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
  */
 public class GroupingDialog extends javax.swing.JDialog implements Dialog {
 
-    private Dimension frameSize;
-    private UIManager.LookAndFeelInfo l[];
+	private Dimension frameSize;
     private SSAData data;
     private JDesktopPane desctop;
-    private DefaultListModel unselectedModel;
+	private DefaultListModel unselectedModel;
     private DefaultListModel groupsModel;
     private JInternalFrame reconstructionFrame;
+
     public GroupingDialog(java.awt.Frame parent, boolean modal, SSAData data, JDesktopPane desctop) {
         super(parent, modal);
         initComponents();
         this.data = data;
         this.desctop = desctop;
         centered();
-        unselectedModel = new DefaultListModel();
+        unselectedModel = new DefaultListModel<>();
         groupsModel = new DefaultListModel();
         for (int i = 0; i < data.getPercentList().size(); i++) {
             unselectedModel.addElement(new UnselectListObject(i, data.getPercentList().get(i)));
@@ -227,6 +227,7 @@ public class GroupingDialog extends javax.swing.JDialog implements Dialog {
         final XYPlot plot = reconstructionChart.getChart().getXYPlot();
         renderer.setSeriesShapesVisible(0, false);
         renderer.setSeriesShapesVisible(1, false);
+        plot.setSeriesRenderingOrder(SeriesRenderingOrder.REVERSE);
         plot.setRenderer(renderer);
         reconstructionFrame = InternalFrame.createInternalFrame(reconstructionChart, "Исходный и восстановленный ряд");
         reconstructionFrame.setName("reconstruction");
