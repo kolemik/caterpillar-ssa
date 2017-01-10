@@ -23,8 +23,8 @@ public class SSA {
 		
 //		String fname = "data/sin.dat"; int L = 48; int componentsCount = 5;
 
-//		String fname = "data/fort.dat"; int L = 84; int componentsCount = 33;
-		String fname = "data/fort120.dat"; int L = 60; int componentsCount = 33;
+		String fname = "data/fort.dat"; int L = 84; int componentsCount = 33;
+//		String fname = "data/fort120.dat"; int L = 60; int componentsCount = 33;
 
 		File file = new File(fname);
 		
@@ -56,8 +56,8 @@ public class SSA {
 		Matrix diagonal = decompose.getD();
 		Matrix U = decompose.getV();
 		
-		Matrix [] Ui = new Matrix[L];
-		Matrix [] eigenVectors = Ui;
+		Matrix [] Ui = new Matrix[L]; // eigenvectors ordered by eigenvalues desc
+//		Matrix [] eigenVectors = Ui;
 		Matrix [] Pi = Ui;
 		Matrix [] Vi = new Matrix[L];
 		double [] eigenValues = new double[L];
@@ -116,15 +116,15 @@ public class SSA {
 			}
 			double sum = 0.0;
 			int l;
-			for (l = 0; d_start_row - l >= 0 && d_start_col + l < L; l++) {
+			for (l = 0; d_start_row - l >= 0 && d_start_col + l < X.getColumnDimension(); l++) {
 				sum += X_sum.get(d_start_row - l, d_start_col + l);
 			}
 			result[k] = Math.round(100 * sum / l) / 100;
 			diff[k] = Math.round(100.0 * ((result[k] - data.get(k)) / data.get(k))) / 100.0;
 		}
 			
-		System.out.println(Arrays.toString(result));
-		System.out.println(Arrays.toString(diff));
+		System.out.println("RESULT: " + Arrays.toString(result));
+		System.out.println("DIFF: " + Arrays.toString(diff));
 		
 /*
  		X_sum = new Matrix(X.getRowDimension(), X.getColumnDimension());
@@ -152,12 +152,15 @@ public class SSA {
 		double lastRes = X_sum.get(X_sum.getRowDimension() - 1, X_sum.getColumnDimension() - 1);
 		do {
 			for (int i = 0; i < L - m; i++) {
-				Y.set(i, 0, result[i + m]);
+				Y.set(i, 0, result[N - L + i + m]);
 			}
-			for (int i = L - m; i < L - 2; i++) {
-				Y.set(i, 0, Y.get(i + 1, 0));
+			if (m > 1) {
+				for (int i = L - m; i < L - 2; i++) {
+					Y.set(i, 0, Y.get(i + 1, 0));
+				}
+				Y.set(L - 2, 0, lastRes);
 			}
-			Y.set(L - 2, 0, lastRes);
+			System.out.print("Step " + m + ": "); Y.transpose().print(7, 5);
 			lastRes = R.transpose().times(Y).get(0, 0);
 			System.out.print(lastRes + "\t");
 		} while (m++ < L);

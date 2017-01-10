@@ -13,8 +13,8 @@ public class RunSSA {
 		SSA ssa = new SSA();
 		List<Double> data = new ArrayList<Double>();
 
-		String fname = "data/sin.dat"; int l = 48, e = 5, m = 48;
-//		String fname = "data/fort.dat"; int l = 84, e = 33, m = 80;
+//		String fname = "data/sin.dat"; int l = 48, e = 5, m = 48;
+		String fname = "data/fort.dat"; int l = 84, e = 33, m = 80;
 //		String fname = "data/fort120.dat"; int l = 60, e = 33, m = 80;
 
 		File file = new File(fname);
