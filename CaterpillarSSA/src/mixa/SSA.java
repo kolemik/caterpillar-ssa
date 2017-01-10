@@ -21,9 +21,10 @@ public class SSA {
 	public static void main(String[] args) {
 		List<Double> data = new ArrayList<Double>();
 		
-//		String fname = "data/sin.dat"; int L = 48; int componentsCount = 5;
-
-		String fname = "data/fort.dat"; int L = 84; int componentsCount = 33;
+//		String fname = "data/linear.dat"; int L = 10; int componentsCount = 5;
+//		String fname = "data/saw.dat"; int L = 16; int componentsCount = 8;
+		String fname = "data/sin.dat"; int L = 48; int componentsCount = 5;
+//		String fname = "data/fort.dat"; int L = 84; int componentsCount = 33;
 //		String fname = "data/fort120.dat"; int L = 60; int componentsCount = 33;
 
 		File file = new File(fname);
@@ -119,7 +120,7 @@ public class SSA {
 			for (l = 0; d_start_row - l >= 0 && d_start_col + l < X.getColumnDimension(); l++) {
 				sum += X_sum.get(d_start_row - l, d_start_col + l);
 			}
-			result[k] = Math.round(100 * sum / l) / 100;
+			result[k] = Math.round(100 * sum / ((double)l)) / 100.0;
 			diff[k] = Math.round(100.0 * ((result[k] - data.get(k)) / data.get(k))) / 100.0;
 		}
 			
@@ -160,9 +161,9 @@ public class SSA {
 				}
 				Y.set(L - 2, 0, lastRes);
 			}
-			System.out.print("Step " + m + ": "); Y.transpose().print(7, 5);
+//			System.out.print("Step " + m + ": "); Y.transpose().print(7, 5);
 			lastRes = R.transpose().times(Y).get(0, 0);
-			System.out.print(lastRes + "\t");
+			System.out.println(lastRes);
 		} while (m++ < L);
 		System.out.println();
 	}

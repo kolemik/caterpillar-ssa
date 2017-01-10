@@ -1,6 +1,9 @@
 package mixa;
 
+import java.util.Date;
+
 import Jama.Matrix;
+import javafx.util.Pair;
 
 public class MatrixTest {
 
@@ -19,6 +22,9 @@ public class MatrixTest {
 		});
 
 		f.times(a).print(5, 2);
+		
+		Pair<Date, Double> point = new Pair<Date, Double>(new Date(), 0.0);
+		System.out.println(point);
 	}
 
 }
